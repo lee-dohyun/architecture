@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSA 아키텍처 구조도</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+        .content {
+            padding: 30px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+        }
+        .tab:hover {
+            background-color: #f8f9fa;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .diagram-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .service-card.deployed {
+            border-left-color: #27ae60;
+        }
+        .service-card.planned {
+            border-left-color: #f39c12;
+        }
+        .service-card h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .service-card .domains {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .status-deployed {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        .status-planned {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+        .issues-list {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .issues-list h3 {
+            color: #e53e3e;
+            margin-top: 0;
+        }
+        .issues-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .issues-list li {
+            margin: 8px 0;
+            color: #4a5568;
+        }
+        .resource-info {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .resource-info h3 {
+            color: #234e52;
+            margin-top: 0;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .resource-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .resource-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .resource-label {
+            color: #718096;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MSA 아키텍처 구조도</h1>
+            <p>K3s 클러스터 마이크로서비스 아키텍처 현황 및 개선 계획</p>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('current')">현재 구조</div>
+                <div class="tab" onclick="showTab('improved')">개선 계획</div>
+                <div class="tab" onclick="showTab('resources')">리소스 현황</div>
+            </div>
+            
+            <div id="current" class="tab-content active">
+                <h2>현재 배포된 서비스들</h2>
+                
+                <div class="diagram-container">
+                    <div class="mermaid">
+                        graph TB
+                            Internet[인터넷] --> DNS[Route 53 DNS]
+                            DNS --> Router[개인 라우터]
+                            Router --> K3s[K3s 클러스터<br/>192.168.50.51]
+                            K3s --> Traefik[Traefik Ingress Controller]
+                            Traefik --> WP[WordPress<br/>leedohyun.com<br/>blog.leedohyun.com]
+                            Traefik --> RM[Redmine<br/>alm.leedohyun.com<br/>redmine.leedohyun.com]
+                            Traefik --> KC[Keycloak<br/>keycloak.leedohyun.com]
+                            Traefik --> MO[MinIO<br/>minio.leedohyun.com<br/>static.leedohyun.com]
+                            
+                            WP --> MySQL1[MySQL<br/>WordPress용]
+                            RM --> MySQL2[MySQL<br/>Redmine용]
+                            KC --> PG[PostgreSQL<br/>Keycloak용]
+                            
+                            MySQL1 --> Redis1[Redis<br/>WordPress용]
+                            
+                            K3s --> Infra[인프라 서비스들<br/>cert-manager, MetalLB<br/>coredns, metrics-server]
+                            
+                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
+                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
+                            
+                            class WP,RM,KC,MO,MySQL1,MySQL2,PG,Redis1,Traefik,Infra deployed
+                    </div>
+                </div>
+                
+                <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>WordPress</h3>
+                        <div class="domains">leedohyun.com, blog.leedohyun.com</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Redmine</h3>
+                        <div class="domains">alm.leedohyun.com, redmine.leedohyun.com</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Keycloak</h3>
+                        <div class="domains">keycloak.leedohyun.com</div>
+                        <div class="domains">통합 인증 서버 (OAuth 2.0 / OpenID Connect)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>MinIO</h3>
+                        <div class="domains">minio.leedohyun.com, static.leedohyun.com</div>
+                        <div class="domains">S3 호환 객체 스토리지</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                </div>
+                
+                <div class="issues-list">
+                    <h3>⚠️ 현재 아키텍처의 주요 문제점들</h3>
+                    <ul>
+                        <li>모니터링 부재 (Prometheus, Grafana 미배포)</li>
+                        <li>보안 취약점 (Service Mesh 부재, 통합 인증 연계 범위 제한)</li>
+                        <li>관찰성 부족 (분산 추적, APM 부재)</li>
+                        <li>스토리지 관리 (백업 시스템 부재)</li>
+                        <li>단일 장애점 (단일 노드 클러스터)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="improved" class="tab-content">
+                <h2>개선 계획</h2>
+                
+                <div class="diagram-container">
+                    <div class="mermaid">
+                        graph TB
+                            Internet[인터넷] --> DNS[Route 53 DNS]
+                            DNS --> Router[개인 라우터]
+                            Router --> K3s[K3s 클러스터<br/>192.168.50.51]
+                            K3s --> Istio[Istio Gateway<br/>msa-gateway.leedohyun.com]
+                            Istio --> Traefik[Traefik Ingress Controller]
+                            
+                            Traefik --> WP[WordPress]
+                            Traefik --> RM[Redmine]
+                            Traefik --> KC[Keycloak<br/>keycloak.leedohyun.com]
+                            
+                            Traefik --> Monitor[모니터링 스택]
+                            Monitor --> Grafana[Grafana<br/>grafana.leedohyun.com]
+                            Monitor --> Prometheus[Prometheus<br/>prometheus.leedohyun.com]
+                            Monitor --> AlertManager[AlertManager<br/>alertmanager.leedohyun.com]
+                            
+                            Traefik --> Observability[관찰성 스택]
+                            Observability --> Kiali[Kiali<br/>kiali.leedohyun.com]
+                            Observability --> Jaeger[Jaeger<br/>jaeger.leedohyun.com]
+                            
+                            Traefik --> Storage[스토리지]
+                            Storage --> MinIO[MinIO<br/>minio.leedohyun.com]
+                            
+                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
+                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
+                            
+                            class WP,RM,KC,MinIO,Traefik deployed
+                            class Grafana,Prometheus,AlertManager,Kiali,Jaeger,Istio planned
+                    </div>
+                </div>
+                
+                <div class="service-grid">
+                    <div class="service-card planned">
+                        <h3>Grafana</h3>
+                        <div class="domains">grafana.leedohyun.com</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>Prometheus</h3>
+                        <div class="domains">prometheus.leedohyun.com</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>Kiali</h3>
+                        <div class="domains">kiali.leedohyun.com</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>Jaeger</h3>
+                        <div class="domains">jaeger.leedohyun.com</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resources" class="tab-content">
+                <h2>리소스 현황</h2>
+                
+                <div class="resource-info">
+                    <h3>현재 클러스터 리소스 사용량</h3>
+                    <div class="resource-grid">
+                        <div class="resource-item">
+                            <div class="resource-value">{{ data.resources.cpu }}</div>
+                            <div class="resource-label">CPU 사용률</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">{{ data.resources.memory }}</div>
+                            <div class="resource-label">메모리 사용률</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">{{ data.resources.nodes }}</div>
+                            <div class="resource-label">노드 수</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-value">{{ data.resources.cluster_type }}</div>
+                            <div class="resource-label">클러스터 타입</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+        
+        function showTab(tabName) {
+            // 모든 탭과 콘텐츠 숨기기
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭과 콘텐츠 보이기
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // API 상태 확인
+        fetch('/api/status')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Status:', data);
+            })
+            .catch(error => {
+                console.error('API Error:', error);
+            });
+    </script>
+</body>
+</html>
