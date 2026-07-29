@@ -181,6 +181,7 @@
         <div class="header">
             <h1>MSA 아키텍처 구조도</h1>
             <p>K3s 클러스터 마이크로서비스 아키텍처 현황 및 개선 계획</p>
+            <p style="opacity:0.6; font-size:0.9em; margin-top:8px;">최종 업데이트: {{ data.updated_at }}</p>
         </div>
         
         <div class="content">
@@ -197,30 +198,43 @@
                     <div class="mermaid">
                         graph TB
                             Internet[인터넷] --> DNS[Route 53 DNS]
-                            DNS --> Router[개인 라우터]
-                            Router --> K3s[K3s 클러스터<br/>192.168.50.51]
-                            K3s --> Traefik[Traefik Ingress Controller]
-                            Traefik --> WP[WordPress<br/>leedohyun.com<br/>blog.leedohyun.com]
-                            Traefik --> RM[Redmine<br/>alm.leedohyun.com<br/>redmine.leedohyun.com]
-                            Traefik --> KC[Keycloak<br/>keycloak.leedohyun.com]
-                            Traefik --> MO[MinIO<br/>minio.leedohyun.com<br/>static.leedohyun.com]
-                            
-                            WP --> MySQL1[MySQL<br/>WordPress용]
-                            RM --> MySQL2[MySQL<br/>Redmine용]
-                            KC --> PG[PostgreSQL<br/>Keycloak용]
-                            
-                            MySQL1 --> Redis1[Redis<br/>WordPress용]
-                            
-                            K3s --> Infra[인프라 서비스들<br/>cert-manager, MetalLB<br/>coredns, metrics-server]
-                            
+                            DNS --> Router[가정용 라우터<br/>포트포워딩 80/443]
+                            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP]
+                            Traefik --> GW[Spring Cloud Gateway<br/>전 도메인 단일 진입점]
+
+                            GW --> WP[WordPress<br/>leedohyun.com / blog]
+                            GW --> RM[Redmine<br/>alm / redmine]
+                            GW --> KC[Keycloak<br/>keycloak.leedohyun.com]
+                            GW --> MO[MinIO<br/>minio / static]
+                            GW --> TL[Tool<br/>tool.leedohyun.com]
+                            GW --> AW[Architecture Web<br/>architecture.leedohyun.com]
+                            GW --> RT[홈 라우터 관리화면<br/>router.leedohyun.com]
+                            GW --> HF[home.front<br/>home.leedohyun.com]
+                            GW --> CF[customer.front<br/>customer.leedohyun.com]
+                            GW --> AA[auth.api<br/>/api/auth/**]
+
+                            AA --> KC
+                            CF -.-> AA
+                            HF -.-> AA
+
+                            WP --> MySQL1[MySQL]
+                            RM --> MySQL1
+                            KC --> PG1[PostgreSQL]
+                            WP --> Redis1[Redis]
+
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
                             classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
-                            
-                            class WP,RM,KC,MO,MySQL1,MySQL2,PG,Redis1,Traefik,Infra deployed
+
+                            class WP,RM,KC,MO,TL,AW,RT,HF,CF,AA,GW,Traefik,MySQL1,PG1,Redis1 deployed
                     </div>
                 </div>
-                
+
                 <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>Spring Cloud Gateway</h3>
+                        <div class="domains">모든 *.leedohyun.com 도메인의 실제 진입점 (2026-07-27 전환 완료)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
                     <div class="service-card deployed">
                         <h3>WordPress</h3>
                         <div class="domains">leedohyun.com, blog.leedohyun.com</div>
@@ -234,7 +248,7 @@
                     <div class="service-card deployed">
                         <h3>Keycloak</h3>
                         <div class="domains">keycloak.leedohyun.com</div>
-                        <div class="domains">통합 인증 서버 (OAuth 2.0 / OpenID Connect)</div>
+                        <div class="domains">SSO/OAuth2·OIDC, customer 라인 인증 위임 대상</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                     <div class="service-card deployed">
@@ -243,16 +257,34 @@
                         <div class="domains">S3 호환 객체 스토리지</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
+                    <div class="service-card deployed">
+                        <h3>Tool</h3>
+                        <div class="domains">tool.leedohyun.com</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Architecture Web</h3>
+                        <div class="domains">architecture.leedohyun.com</div>
+                        <div class="domains">지금 보고 계신 이 페이지 (Flask)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>home.front / customer.front / auth.api</h3>
+                        <div class="domains">home.leedohyun.com, customer.leedohyun.com</div>
+                        <div class="domains">customer 제품 라인 — 로그인/회원가입은 Keycloak에 위임 (Direct Access Grant)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
                 </div>
-                
+
                 <div class="issues-list">
                     <h3>⚠️ 현재 아키텍처의 주요 문제점들</h3>
                     <ul>
-                        <li>모니터링 부재 (Prometheus, Grafana 미배포)</li>
-                        <li>보안 취약점 (Service Mesh 부재, 통합 인증 연계 범위 제한)</li>
+                        <li>모니터링 부재 (Prometheus, Grafana, AlertManager 미배포)</li>
+                        <li>백업 체계 없음 (PVC가 local-path 기반, 노드 장애 시 데이터 손실 위험)</li>
+                        <li>보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)</li>
                         <li>관찰성 부족 (분산 추적, APM 부재)</li>
-                        <li>스토리지 관리 (백업 시스템 부재)</li>
-                        <li>단일 장애점 (단일 노드 클러스터)</li>
+                        <li>단일 장애점 (단일 노드 클러스터, 이중화 없음)</li>
+                        <li>CD 자동화는 gateway/auth.api/home.front만 완료, customer.front 등은 여전히 수동 배포</li>
                     </ul>
                 </div>
             </div>
@@ -265,35 +297,42 @@
                         graph TB
                             Internet[인터넷] --> DNS[Route 53 DNS]
                             DNS --> Router[개인 라우터]
-                            Router --> K3s[K3s 클러스터<br/>192.168.50.51]
-                            K3s --> Istio[Istio Gateway<br/>msa-gateway.leedohyun.com]
-                            Istio --> Traefik[Traefik Ingress Controller]
-                            
-                            Traefik --> WP[WordPress]
-                            Traefik --> RM[Redmine]
-                            Traefik --> KC[Keycloak<br/>keycloak.leedohyun.com]
-                            
-                            Traefik --> Monitor[모니터링 스택]
+                            Router --> Traefik[Traefik Ingress]
+                            Traefik --> GW[Spring Cloud Gateway<br/>단일 진입점 - 이미 완료]
+                            Traefik --> Istio[Istio 서비스 메시<br/>mTLS]
+
+                            GW --> WP[WordPress]
+                            GW --> RM[Redmine]
+                            GW --> KC[Keycloak]
+                            GW --> Customer[customer 제품 라인]
+
+                            GW --> Monitor[모니터링 스택]
                             Monitor --> Grafana[Grafana<br/>grafana.leedohyun.com]
                             Monitor --> Prometheus[Prometheus<br/>prometheus.leedohyun.com]
                             Monitor --> AlertManager[AlertManager<br/>alertmanager.leedohyun.com]
-                            
-                            Traefik --> Observability[관찰성 스택]
+
+                            GW --> Observability[관찰성 스택]
                             Observability --> Kiali[Kiali<br/>kiali.leedohyun.com]
                             Observability --> Jaeger[Jaeger<br/>jaeger.leedohyun.com]
-                            
-                            Traefik --> Storage[스토리지]
+
+                            GW --> Storage[스토리지]
                             Storage --> MinIO[MinIO<br/>minio.leedohyun.com]
-                            
+                            Storage --> Velero[Velero<br/>PVC 자동 백업]
+
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
                             classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
-                            
-                            class WP,RM,KC,MinIO,Traefik deployed
-                            class Grafana,Prometheus,AlertManager,Kiali,Jaeger,Istio planned
+
+                            class WP,RM,KC,Customer,MinIO,Traefik,GW deployed
+                            class Grafana,Prometheus,AlertManager,Kiali,Jaeger,Istio,Velero planned
                     </div>
                 </div>
-                
+
                 <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>Spring Cloud Gateway 단일 진입점</h3>
+                        <div class="domains">2026-07-27 전환 완료 — 더 이상 "계획"이 아니라 실제 운영 중</div>
+                        <span class="status-badge status-deployed">완료됨</span>
+                    </div>
                     <div class="service-card planned">
                         <h3>Grafana</h3>
                         <div class="domains">grafana.leedohyun.com</div>
@@ -312,6 +351,11 @@
                     <div class="service-card planned">
                         <h3>Jaeger</h3>
                         <div class="domains">jaeger.leedohyun.com</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>Velero (백업 자동화)</h3>
+                        <div class="domains">PVC 자동 백업, 현재 미구축</div>
                         <span class="status-badge status-planned">계획됨</span>
                     </div>
                 </div>
