@@ -18,8 +18,7 @@ architecture_data = {
                 {"name": "MinIO", "domains": ["minio.leedohyun.com", "static.leedohyun.com"], "status": "deployed"},
                 {"name": "Tool", "domains": ["tool.leedohyun.com"], "status": "deployed"},
                 {"name": "Architecture Web", "domains": ["architecture.leedohyun.com"], "status": "deployed"},
-                {"name": "라우터 관리화면 프록시", "domains": ["router.leedohyun.com"], "status": "deployed"},
-                {"name": "Grafana (모니터링)", "domains": ["monitoring.leedohyun.com"], "desc": "kube-prometheus-stack, Alertmanager 외부 알림 미연동", "status": "deployed"}
+                {"name": "라우터 관리화면 프록시", "domains": ["router.leedohyun.com"], "status": "deployed"}
             ],
             "shop_line": [
                 {"name": "home.front", "domains": ["home.posselect.com"], "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js)", "status": "deployed"},
@@ -27,7 +26,8 @@ architecture_data = {
                 {"name": "product.front / product-api", "domains": ["product.posselect.com"], "desc": "상품 목록/장바구니, 비로그인도 이용 가능(OPTIONAL_AUTH_HOSTS)", "status": "deployed"},
                 {"name": "order-api", "domains": ["/api/orders/** (customer.posselect.com, product.posselect.com)"], "desc": "주문/결제(mock), 로그인 시 계정에 자동 연결", "status": "deployed"},
                 {"name": "admin.front", "domains": ["admin.posselect.com"], "desc": "관리자 백오피스, Keycloak(staff realm) 로그인", "status": "deployed"},
-                {"name": "Keycloak", "domains": ["keycloak.posselect.com"], "desc": "SSO/OAuth2·OIDC — 2026-08-02부로 쇼핑몰 전용, 개인 서비스와 완전 분리", "status": "deployed"}
+                {"name": "Keycloak", "domains": ["keycloak.posselect.com"], "desc": "SSO/OAuth2·OIDC — 2026-08-02부로 쇼핑몰 전용, 개인 서비스와 완전 분리", "status": "deployed"},
+                {"name": "Grafana (모니터링)", "domains": ["monitoring.posselect.com"], "desc": "2026-08-02: monitoring.leedohyun.com에서 이전, 쇼핑몰 전용 모니터링으로 재정의. gateway/auth-api/order-api/product-api의 /actuator/prometheus + postgres-exporter + redis-exporter를 실제로 스크레이핑", "status": "deployed"}
             ],
             "mail": [
                 {"name": "자체 메일서버 (docker-mailserver)", "domains": ["customer-service@leedohyun.com", "customer-service@posselect.com"], "desc": "인증메일/주문알림 발신, 두 도메인 모두 DKIM 서명", "status": "deployed"}

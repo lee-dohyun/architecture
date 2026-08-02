@@ -221,7 +221,6 @@
                                 TL[Tool]
                                 AW[Architecture Web]
                                 RT[라우터 관리화면 프록시]
-                                GF[Grafana<br/>monitoring]
                             end
 
                             subgraph posselect[posselect.com 쇼핑몰]
@@ -233,6 +232,7 @@
                                 PA[product-api]
                                 OA[order-api]
                                 KC[Keycloak<br/>keycloak.posselect.com]
+                                GF[Grafana<br/>monitoring.posselect.com]
                             end
 
                             GW --> WP
@@ -256,6 +256,13 @@
                             CF -.-> AA
                             HF -.-> AA
                             PA -.-> OA
+
+                            GF -.->|메트릭 스크레이핑| GW
+                            GF -.->|메트릭 스크레이핑| AA
+                            GF -.->|메트릭 스크레이핑| PA
+                            GF -.->|메트릭 스크레이핑| OA
+                            GF -.->|익스포터 경유| PG2
+                            GF -.->|익스포터 경유| Redis2
 
                             GW -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]
 
@@ -307,12 +314,6 @@
                         <div class="domains">지금 보고 계신 이 페이지 (Flask)</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
-                    <div class="service-card deployed">
-                        <h3>Grafana</h3>
-                        <div class="domains">monitoring.leedohyun.com</div>
-                        <div class="domains">kube-prometheus-stack, 외부 알림 채널 미연동</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
                 </div>
 
                 <h3 style="margin-top:30px;">쇼핑몰 서비스 (posselect.com — 2026-08-02 신규 도메인으로 완전 분리)</h3>
@@ -353,6 +354,12 @@
                         <div class="domains">SSO/OAuth2·OIDC — 쇼핑몰 전용, 개인 서비스와 완전 분리</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
+                    <div class="service-card deployed">
+                        <h3>Grafana</h3>
+                        <div class="domains">monitoring.posselect.com</div>
+                        <div class="domains">2026-08-02: monitoring.leedohyun.com에서 이전, 쇼핑몰 전용 모니터링으로 재정의. gateway/auth-api/order-api/product-api가 /actuator/prometheus 노출, postgres-exporter·redis-exporter까지 붙여서 실제 서비스 메트릭을 스크레이핑 (이전엔 kube-system 컴포넌트만 대상)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
                 </div>
 
                 <div class="issues-list">
@@ -360,7 +367,7 @@
                     <ul>
                         <li>백업 체계 없음 (PVC가 local-path 기반, 노드 장애 시 데이터 손실 위험)</li>
                         <li>보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)</li>
-                        <li>관찰성 부족 (분산 추적, APM 부재 — 메트릭 수집만 됨)</li>
+                        <li>분산 추적/APM 부재 (2026-08-02부로 쇼핑몰 실제 서비스+DB/Redis 메트릭 수집은 연결 완료, 트레이싱은 여전히 없음)</li>
                         <li>단일 장애점 (단일 노드 클러스터, 이중화 없음)</li>
                         <li>Alertmanager 외부 알림 채널(Email/Slack) 미연동</li>
                         <li>자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음</li>
@@ -481,7 +488,7 @@
                     </div>
                     <div class="service-card deployed">
                         <h3>Prometheus / Grafana</h3>
-                        <div class="domains">monitoring.leedohyun.com — 2026-07-29 배포 완료</div>
+                        <div class="domains">monitoring.posselect.com — 2026-07-29 배포, 2026-08-02 posselect.com 이전 + 쇼핑몰 실제 서비스/DB/Redis 메트릭 연결 완료</div>
                         <span class="status-badge status-deployed">완료됨</span>
                     </div>
                     <div class="service-card planned">
