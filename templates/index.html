@@ -174,6 +174,15 @@
             color: #718096;
             font-size: 0.9em;
         }
+        .domains a {
+            color: #3182ce;
+            text-decoration: none;
+            border-bottom: 1px dotted #3182ce;
+        }
+        .domains a:hover {
+            color: #2c5282;
+            border-bottom-style: solid;
+        }
     </style>
 </head>
 <body>
@@ -528,7 +537,20 @@
 
     <script>
         mermaid.initialize({ startOnLoad: true });
-        
+
+        // .domains 안에 나오는 leedohyun.com/posselect.com 계열 도메인을 새 탭으로 열리는
+        // 링크로 자동 치환한다. 이메일 주소(@ 뒤 도메인)나 이미 링크로 감싸진 텍스트는 건너뛴다.
+        function linkifyDomains() {
+            const domainPattern = /(?<![@.\w])((?:[a-zA-Z0-9_-]+\.)*(?:leedohyun|posselect)\.com)\b/g;
+            document.querySelectorAll('.domains').forEach((el) => {
+                if (el.querySelector('a')) return;
+                el.innerHTML = el.innerHTML.replace(domainPattern, (match) => {
+                    return `<a href="https://${match}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+                });
+            });
+        }
+        linkifyDomains();
+
         function showTab(tabName) {
             // 모든 탭과 콘텐츠 숨기기
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
