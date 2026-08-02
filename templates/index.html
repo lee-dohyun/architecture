@@ -187,6 +187,7 @@
         <div class="content">
             <div class="tabs">
                 <div class="tab active" onclick="showTab('current')">현재 구조</div>
+                <div class="tab" onclick="showTab('domainsplit')">도메인 구성</div>
                 <div class="tab" onclick="showTab('improved')">개선 계획</div>
                 <div class="tab" onclick="showTab('resources')">리소스 현황</div>
             </div>
@@ -197,42 +198,77 @@
                 <div class="diagram-container">
                     <div class="mermaid">
                         graph TB
-                            Internet[인터넷] --> DNS[Route 53 DNS]
-                            DNS --> Router[가정용 라우터<br/>포트포워딩 80/443]
-                            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP]
-                            Traefik --> GW[Spring Cloud Gateway<br/>전 도메인 단일 진입점]
+                            Internet[인터넷] --> DNS1[Route 53<br/>leedohyun.com]
+                            Internet --> DNS2[Route 53<br/>posselect.com]
+                            DNS1 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]
+                            DNS2 --> Router
+                            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]
+                            Traefik --> GW[Spring Cloud Gateway<br/>두 도메인 공용 단일 진입점]
 
-                            GW --> WP[WordPress<br/>leedohyun.com / blog]
-                            GW --> RM[Redmine<br/>alm / redmine]
-                            GW --> KC[Keycloak<br/>keycloak.leedohyun.com]
-                            GW --> MO[MinIO<br/>minio / static]
-                            GW --> TL[Tool<br/>tool.leedohyun.com]
-                            GW --> AW[Architecture Web<br/>architecture.leedohyun.com]
-                            GW --> RT[홈 라우터 관리화면<br/>router.leedohyun.com]
-                            GW --> HF[home.front<br/>home.leedohyun.com]
-                            GW --> CF[customer.front<br/>customer.leedohyun.com]
-                            GW --> AA[auth.api<br/>/api/auth/**]
+                            subgraph leedohyun[leedohyun.com 개인 서비스]
+                                WP[WordPress<br/>leedohyun.com / blog]
+                                RM[Redmine<br/>alm / redmine]
+                                MO[MinIO<br/>minio / static]
+                                TL[Tool]
+                                AW[Architecture Web]
+                                RT[라우터 관리화면 프록시]
+                                GF[Grafana<br/>monitoring]
+                            end
+
+                            subgraph posselect[posselect.com 쇼핑몰]
+                                HF[home.front]
+                                CF[customer.front]
+                                PF[product.front]
+                                ADF[admin.front]
+                                AA[auth.api]
+                                PA[product-api]
+                                OA[order-api]
+                                KC[Keycloak<br/>keycloak.posselect.com]
+                            end
+
+                            GW --> WP
+                            GW --> RM
+                            GW --> MO
+                            GW --> TL
+                            GW --> AW
+                            GW --> RT
+                            GW --> GF
+                            GW --> HF
+                            GW --> CF
+                            GW --> PF
+                            GW --> ADF
+                            GW --> AA
+                            GW --> PA
+                            GW --> OA
+                            GW --> KC
 
                             AA --> KC
+                            ADF -.-> KC
                             CF -.-> AA
                             HF -.-> AA
+                            PA -.-> OA
+
+                            GW -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]
 
                             WP --> MySQL1[MySQL]
                             RM --> MySQL1
                             KC --> PG1[PostgreSQL]
+                            PA --> PG2[PostgreSQL<br/>catalog]
+                            OA --> PG3[PostgreSQL<br/>orders]
                             WP --> Redis1[Redis]
+                            PA --> Redis2[Redis<br/>장바구니]
 
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
 
-                            class WP,RM,KC,MO,TL,AW,RT,HF,CF,AA,GW,Traefik,MySQL1,PG1,Redis1 deployed
+                            class WP,RM,KC,MO,TL,AW,RT,GF,HF,CF,PF,ADF,AA,PA,OA,GW,Traefik,MAIL,MySQL1,PG1,PG2,PG3,Redis1,Redis2 deployed
                     </div>
                 </div>
 
+                <h3 style="margin-top:30px;">개인 서비스 (leedohyun.com)</h3>
                 <div class="service-grid">
                     <div class="service-card deployed">
                         <h3>Spring Cloud Gateway</h3>
-                        <div class="domains">모든 *.leedohyun.com 도메인의 실제 진입점 (2026-07-27 전환 완료)</div>
+                        <div class="domains">*.leedohyun.com + *.posselect.com 전체의 실제 진입점 (2026-08-02부로 두 도메인 공유)</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                     <div class="service-card deployed">
@@ -243,12 +279,6 @@
                     <div class="service-card deployed">
                         <h3>Redmine</h3>
                         <div class="domains">alm.leedohyun.com, redmine.leedohyun.com</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Keycloak</h3>
-                        <div class="domains">keycloak.leedohyun.com</div>
-                        <div class="domains">SSO/OAuth2·OIDC, customer 라인 인증 위임 대상</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                     <div class="service-card deployed">
@@ -269,9 +299,49 @@
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                     <div class="service-card deployed">
-                        <h3>home.front / customer.front / auth.api</h3>
-                        <div class="domains">home.leedohyun.com, customer.leedohyun.com</div>
-                        <div class="domains">customer 제품 라인 — 로그인/회원가입은 Keycloak에 위임 (Direct Access Grant)</div>
+                        <h3>Grafana</h3>
+                        <div class="domains">monitoring.leedohyun.com</div>
+                        <div class="domains">kube-prometheus-stack, 외부 알림 채널 미연동</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:30px;">쇼핑몰 서비스 (posselect.com — 2026-08-02 신규 도메인으로 완전 분리)</h3>
+                <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>home.front</h3>
+                        <div class="domains">home.posselect.com</div>
+                        <div class="domains">쇼핑몰 메인 랜딩 페이지</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>customer.front / auth.api</h3>
+                        <div class="domains">customer.posselect.com</div>
+                        <div class="domains">로그인/회원가입/이메일 인증, Keycloak(customer realm) 위임 인증</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>product.front / product-api</h3>
+                        <div class="domains">product.posselect.com</div>
+                        <div class="domains">상품 목록/장바구니 — 비로그인도 이용 가능</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>order-api</h3>
+                        <div class="domains">/api/orders/** (customer/product.posselect.com)</div>
+                        <div class="domains">주문/결제(mock), 결제완료 시 메일 발송</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>admin.front</h3>
+                        <div class="domains">admin.posselect.com</div>
+                        <div class="domains">관리자 백오피스, Keycloak(staff realm) 로그인</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Keycloak</h3>
+                        <div class="domains">keycloak.posselect.com</div>
+                        <div class="domains">SSO/OAuth2·OIDC — 쇼핑몰 전용, 개인 서비스와 완전 분리</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                 </div>
@@ -279,12 +349,81 @@
                 <div class="issues-list">
                     <h3>⚠️ 현재 아키텍처의 주요 문제점들</h3>
                     <ul>
-                        <li>모니터링 부재 (Prometheus, Grafana, AlertManager 미배포)</li>
                         <li>백업 체계 없음 (PVC가 local-path 기반, 노드 장애 시 데이터 손실 위험)</li>
                         <li>보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)</li>
-                        <li>관찰성 부족 (분산 추적, APM 부재)</li>
+                        <li>관찰성 부족 (분산 추적, APM 부재 — 메트릭 수집만 됨)</li>
                         <li>단일 장애점 (단일 노드 클러스터, 이중화 없음)</li>
-                        <li>CD 자동화는 gateway/auth.api/home.front만 완료, customer.front 등은 여전히 수동 배포</li>
+                        <li>Alertmanager 외부 알림 채널(Email/Slack) 미연동</li>
+                        <li>자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음</li>
+                        <li>architecture-web/tool/wordpress는 여전히 수동 배포</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="domainsplit" class="tab-content">
+                <h2>도메인 구성 — leedohyun.com(개인) / posselect.com(쇼핑몰) 분리 (2026-08-02)</h2>
+                <p style="color:#4a5568; line-height:1.6;">
+                    원래 쇼핑몰(customer 제품 라인)은 leedohyun.com의 서브도메인으로 얹혀 있었으나,
+                    별도 도메인 <strong>posselect.com</strong>을 신규 구매해 완전히 분리했다.
+                    K3s 클러스터·게이트웨이·메일서버는 계속 공유하되, DNS·TLS 인증서·Ingress·Keycloak·
+                    인증 쿠키까지 도메인 단위로 독립시켰다.
+                </p>
+
+                <div class="diagram-container">
+                    <div class="mermaid">
+                        graph LR
+                            subgraph before[이전: leedohyun.com 단일 도메인]
+                                B1[leedohyun.com] --> B2[home / customer / product / admin]
+                                B1 --> B3[blog / redmine / minio / tool / ...]
+                                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]
+                            end
+
+                            subgraph after[현재: 도메인 분리]
+                                A1[leedohyun.com<br/>개인 전용] --> A2[blog / redmine / minio / tool / architecture / router / monitoring]
+                                A3[posselect.com<br/>쇼핑몰 전용] --> A4[home / customer / product / admin]
+                                A3 --> A5[Keycloak<br/>keycloak.posselect.com]
+                            end
+
+                            before -.전환.-> after
+
+                            classDef old fill:#fef5e7,stroke:#f39c12,stroke-width:2px
+                            classDef new fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
+                            class B1,B2,B3,B4 old
+                            class A1,A2,A3,A4,A5 new
+                    </div>
+                </div>
+
+                <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>leedohyun.com — 개인 전용</h3>
+                        <div class="domains">leedohyun.com/www → blog.leedohyun.com 리다이렉트</div>
+                        <div class="domains">blog·wordpress, alm·redmine, minio·static, tool, architecture, router, monitoring</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>posselect.com — 쇼핑몰 전용</h3>
+                        <div class="domains">posselect.com/www → home.posselect.com 리다이렉트</div>
+                        <div class="domains">home, customer, product, admin, keycloak</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>구 도메인 호환성</h3>
+                        <div class="domains">home/customer/product/admin/keycloak.leedohyun.com</div>
+                        <div class="domains">삭제하지 않고 posselect.com으로 302 리다이렉트 — 기존 북마크/링크 유지</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:30px;">이전하면서 바뀐 것들</h3>
+                <div class="issues-list" style="background:#f0fff4; border-color:#9ae6b4;">
+                    <ul>
+                        <li>Route53: posselect.com 신규 호스팅 영역, A(root+wildcard)/MX/SPF/DMARC/DKIM 레코드 추가</li>
+                        <li>TLS: posselect.com 전용 와일드카드 Certificate 신규 발급 (leedohyun.com과 별개 관리)</li>
+                        <li>Ingress: posselect-com-ingress.yaml 신규 (기존과 동일한 단일 진입점 패턴)</li>
+                        <li>게이트웨이: 인증 관련 하드코딩 값(EXPECTED_ISSUER, PROTECTED_HOSTS 등)을 property로 외부화 — 다음 도메인 이전 때 코드 수정 불필요</li>
+                        <li>쿠키: ACCESS_TOKEN Domain을 .leedohyun.com → .posselect.com으로 전환</li>
+                        <li>Keycloak: KC_HOSTNAME을 keycloak.posselect.com으로 변경, 쇼핑몰 전용으로 완전 분리</li>
+                        <li>메일: customer-service@posselect.com 계정 신규 생성, DKIM 키 별도 발급</li>
                     </ul>
                 </div>
             </div>
@@ -295,7 +434,7 @@
                 <div class="diagram-container">
                     <div class="mermaid">
                         graph TB
-                            Internet[인터넷] --> DNS[Route 53 DNS]
+                            Internet[인터넷] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]
                             DNS --> Router[개인 라우터]
                             Router --> Traefik[Traefik Ingress]
                             Traefik --> GW[Spring Cloud Gateway<br/>단일 진입점 - 이미 완료]
@@ -304,53 +443,51 @@
                             GW --> WP[WordPress]
                             GW --> RM[Redmine]
                             GW --> KC[Keycloak]
-                            GW --> Customer[customer 제품 라인]
+                            GW --> Shop[쇼핑몰 - posselect.com]
 
-                            GW --> Monitor[모니터링 스택]
-                            Monitor --> Grafana[Grafana<br/>grafana.leedohyun.com]
-                            Monitor --> Prometheus[Prometheus<br/>prometheus.leedohyun.com]
-                            Monitor --> AlertManager[AlertManager<br/>alertmanager.leedohyun.com]
+                            GW --> Monitor[모니터링 스택<br/>Prometheus/Grafana - 완료]
+                            Monitor --> AlertManager[Alertmanager 외부 알림<br/>Email/Slack 연동]
 
                             GW --> Observability[관찰성 스택]
-                            Observability --> Kiali[Kiali<br/>kiali.leedohyun.com]
-                            Observability --> Jaeger[Jaeger<br/>jaeger.leedohyun.com]
+                            Observability --> Kiali[Kiali]
+                            Observability --> Jaeger[Jaeger]
 
                             GW --> Storage[스토리지]
-                            Storage --> MinIO[MinIO<br/>minio.leedohyun.com]
+                            Storage --> MinIO[MinIO]
                             Storage --> Velero[Velero<br/>PVC 자동 백업]
 
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
                             classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
 
-                            class WP,RM,KC,Customer,MinIO,Traefik,GW deployed
-                            class Grafana,Prometheus,AlertManager,Kiali,Jaeger,Istio,Velero planned
+                            class WP,RM,KC,Shop,MinIO,Traefik,GW,Monitor deployed
+                            class AlertManager,Kiali,Jaeger,Istio,Velero planned
                     </div>
                 </div>
 
                 <div class="service-grid">
                     <div class="service-card deployed">
                         <h3>Spring Cloud Gateway 단일 진입점</h3>
-                        <div class="domains">2026-07-27 전환 완료 — 더 이상 "계획"이 아니라 실제 운영 중</div>
+                        <div class="domains">2026-07-27 전환, 2026-08-02 posselect.com까지 확장 — 실제 운영 중</div>
+                        <span class="status-badge status-deployed">완료됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Prometheus / Grafana</h3>
+                        <div class="domains">monitoring.leedohyun.com — 2026-07-29 배포 완료</div>
                         <span class="status-badge status-deployed">완료됨</span>
                     </div>
                     <div class="service-card planned">
-                        <h3>Grafana</h3>
-                        <div class="domains">grafana.leedohyun.com</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>Prometheus</h3>
-                        <div class="domains">prometheus.leedohyun.com</div>
+                        <h3>Alertmanager 외부 알림</h3>
+                        <div class="domains">Email/Slack 채널 연동 — 알림 규칙은 있으나 실시간 통보 안 됨</div>
                         <span class="status-badge status-planned">계획됨</span>
                     </div>
                     <div class="service-card planned">
                         <h3>Kiali</h3>
-                        <div class="domains">kiali.leedohyun.com</div>
+                        <div class="domains">서비스 메시 관찰성</div>
                         <span class="status-badge status-planned">계획됨</span>
                     </div>
                     <div class="service-card planned">
                         <h3>Jaeger</h3>
-                        <div class="domains">jaeger.leedohyun.com</div>
+                        <div class="domains">분산 트레이싱</div>
                         <span class="status-badge status-planned">계획됨</span>
                     </div>
                     <div class="service-card planned">
