@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# 아키텍처 데이터 (2026-08-02 최신화 — posselect.com 쇼핑몰 도메인 분리 반영)
+# 아키텍처 데이터 (2026-08-05 최신화 — Loki/Velero/Jaeger 관찰성 스택, 로그인 부가기능 반영)
 architecture_data = {
     "current": {
         "title": "현재 K3s 클러스터 아키텍처 구조도 (실제 배포 상태)",
@@ -22,7 +22,7 @@ architecture_data = {
             ],
             "shop_line": [
                 {"name": "home.front", "domains": ["home.posselect.com"], "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js)", "status": "deployed"},
-                {"name": "customer.front / auth.api", "domains": ["customer.posselect.com"], "desc": "로그인/회원가입/정보수정, Keycloak(customer realm) 위임 인증", "status": "deployed"},
+                {"name": "customer.front / auth.api", "domains": ["customer.posselect.com"], "desc": "로그인/회원가입/이메일 인증/정보수정, Keycloak(customer realm) 위임 인증. 2026-08-04: 아이디 찾기, 비밀번호 찾기, 로그인 상태 유지(리프레시 토큰 자동 갱신) 추가", "status": "deployed"},
                 {"name": "product.front / product-api", "domains": ["product.posselect.com"], "desc": "상품 목록/장바구니, 비로그인도 이용 가능(OPTIONAL_AUTH_HOSTS)", "status": "deployed"},
                 {"name": "order-api", "domains": ["/api/orders/** (customer.posselect.com, product.posselect.com)"], "desc": "주문/결제(mock), 로그인 시 계정에 자동 연결", "status": "deployed"},
                 {"name": "admin.front", "domains": ["admin.posselect.com"], "desc": "관리자 백오피스, Keycloak(staff realm) 로그인", "status": "deployed"},
@@ -48,7 +48,10 @@ architecture_data = {
                 {"name": "MetalLB", "status": "deployed"},
                 {"name": "coredns", "status": "deployed"},
                 {"name": "metrics-server", "status": "deployed"},
-                {"name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)", "status": "deployed"}
+                {"name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)", "desc": "2026-08-04: Alertmanager Email 알림 채널 연동 완료(자체 메일서버 경유), Grafana에 Traefik 공식 대시보드 import", "status": "deployed"},
+                {"name": "Loki / Promtail", "desc": "2026-08-04 배포. 전 네임스페이스 컨테이너 로그 수집, 보관 14일, Grafana Explore에서 조회", "status": "deployed"},
+                {"name": "Jaeger (분산 트레이싱)", "desc": "2026-08-04 배포. OTel Java 자동계측(javaagent)으로 gateway/auth-api/order-api/product-api 계측, HTTP+JDBC 스팬 수집. UI 미노출(port-forward 전용), Next.js 프론트는 미계측", "status": "deployed"},
+                {"name": "Velero (백업 자동화)", "desc": "2026-08-04 배포. MinIO를 백업 스토리지로 재사용, node-agent(fs-backup)로 PVC 데이터 포함 전 네임스페이스 매일 백업(보관 10일). 백업 성공은 확인, 실제 restore 리허설은 아직 미검증", "status": "deployed"}
             ],
             "cicd": [
                 {"name": "GitHub Actions CI (이미지 빌드+푸시)", "scope": "전 저장소", "status": "deployed"},
@@ -57,13 +60,14 @@ architecture_data = {
             ]
         },
         "issues": [
-            "백업 체계 없음 (PVC가 local-path 기반, 노드 장애 시 데이터 손실 위험)",
+            "백업은 자동화됐으나(Velero) 실제 restore 리허설 미검증 — 백업 성공이 복구 가능을 보장하지 않음",
             "보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)",
-            "관찰성 부족 (분산 추적, APM 부재 — 메트릭 수집만 됨)",
+            "분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트 4개는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
             "단일 장애점 (단일 노드 클러스터, 이중화 없음)",
-            "Alertmanager 외부 알림 채널(Email/Slack) 미연동 — 알림 규칙은 평가되나 실시간 통보 안 됨",
+            "Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",
             "자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음 (구조적 한계)",
-            "architecture-web/tool/wordpress는 여전히 수동 배포"
+            "architecture-web/tool/wordpress는 여전히 수동 배포",
+            "customer.front 간편 로그인(카카오/네이버/구글)·휴대폰 본인인증·약관 실제 페이지·마케팅 수신동의 백엔드 저장 미구현 (UI만 존재)"
         ]
     },
     "domain_split": {
@@ -83,12 +87,12 @@ architecture_data = {
         "backward_compat": "구 leedohyun.com 쪽 쇼핑몰 호스트 5개(home/customer/product/admin/keycloak.leedohyun.com)는 삭제하지 않고 posselect.com으로 302 리다이렉트 — 기존 북마크/링크 호환성 유지"
     },
     "resources": {
-        "cpu": "4% (580m / 6코어)",
-        "memory": "23% (7.6Gi / 31Gi)",
+        "cpu": "9% (1146m / 6코어, 변동폭 큼)",
+        "memory": "50% (16.1Gi / 31Gi)",
         "nodes": 1,
         "cluster_type": "K3s v1.33 (단일 노드, control-plane 겸 worker)"
     },
-    "updated_at": "2026-08-02"
+    "updated_at": "2026-08-05"
 }
 
 @app.route('/')

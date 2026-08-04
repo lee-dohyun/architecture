@@ -263,6 +263,14 @@
                             GF -.->|메트릭 스크레이핑| OA
                             GF -.->|익스포터 경유| PG2
                             GF -.->|익스포터 경유| Redis2
+                            GF --> AM[Alertmanager<br/>Email 알림]
+
+                            LOKI[Loki<br/>로그 수집] -.->|Promtail 전 네임스페이스| GW
+                            JG[Jaeger<br/>분산 트레이싱] -.->|OTel javaagent| GW
+                            JG -.-> AA
+                            JG -.-> PA
+                            JG -.-> OA
+                            VL[Velero<br/>PVC 백업] -.->|node-agent, MinIO에 저장| MO
 
                             GW -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]
 
@@ -276,7 +284,7 @@
 
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
 
-                            class WP,RM,KC,MO,TL,AW,RT,GF,HF,CF,PF,ADF,AA,PA,OA,GW,Traefik,MAIL,MySQL1,PG1,PG2,PG3,Redis1,Redis2 deployed
+                            class WP,RM,KC,MO,TL,AW,RT,GF,HF,CF,PF,ADF,AA,PA,OA,GW,Traefik,MAIL,MySQL1,PG1,PG2,PG3,Redis1,Redis2,AM,LOKI,JG,VL deployed
                     </div>
                 </div>
 
@@ -328,6 +336,7 @@
                         <h3>customer.front / auth.api</h3>
                         <div class="domains">customer.posselect.com</div>
                         <div class="domains">로그인/회원가입/이메일 인증, Keycloak(customer realm) 위임 인증</div>
+                        <div class="domains">2026-08-04: 아이디 찾기, 비밀번호 찾기, 로그인 상태 유지(리프레시 토큰 자동 갱신) 추가. 간편 로그인/휴대폰 인증은 UI만 존재, 별도 이슈로 분리</div>
                         <span class="status-badge status-deployed">배포됨</span>
                     </div>
                     <div class="service-card deployed">
@@ -362,16 +371,41 @@
                     </div>
                 </div>
 
+                <h3 style="margin-top:30px;">관찰성 / 운영 (2026-08-04 신규)</h3>
+                <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>Loki / Promtail</h3>
+                        <div class="domains">로그 수집, 보관 14일 — Grafana Explore에서 조회</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Jaeger</h3>
+                        <div class="domains">분산 트레이싱 — Java 백엔드 4개(gateway/auth-api/order-api/product-api) OTel 자동계측, HTTP+JDBC 스팬 수집. UI 미노출(port-forward 전용)</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Velero</h3>
+                        <div class="domains">전 네임스페이스 매일 백업(보관 10일), MinIO에 저장. restore 리허설은 미검증</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Alertmanager</h3>
+                        <div class="domains">Email 알림 채널 연동 완료(자체 메일서버 경유). Slack 등 추가 채널 미연동</div>
+                        <span class="status-badge status-deployed">배포됨</span>
+                    </div>
+                </div>
+
                 <div class="issues-list">
                     <h3>⚠️ 현재 아키텍처의 주요 문제점들</h3>
                     <ul>
-                        <li>백업 체계 없음 (PVC가 local-path 기반, 노드 장애 시 데이터 손실 위험)</li>
+                        <li>백업은 자동화됐으나(Velero) 실제 restore 리허설 미검증 — 백업 성공이 복구 가능을 보장하지 않음</li>
                         <li>보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)</li>
-                        <li>분산 추적/APM 부재 (2026-08-02부로 쇼핑몰 실제 서비스+DB/Redis 메트릭 수집은 연결 완료, 트레이싱은 여전히 없음)</li>
+                        <li>분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트 4개는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음</li>
                         <li>단일 장애점 (단일 노드 클러스터, 이중화 없음)</li>
-                        <li>Alertmanager 외부 알림 채널(Email/Slack) 미연동</li>
+                        <li>Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동</li>
                         <li>자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음</li>
                         <li>architecture-web/tool/wordpress는 여전히 수동 배포</li>
+                        <li>customer.front 간편 로그인(카카오/네이버/구글)·휴대폰 본인인증·약관 실제 페이지·마케팅 수신동의 백엔드 저장 미구현 (UI만 존재)</li>
                     </ul>
                 </div>
             </div>
@@ -461,22 +495,22 @@
                             GW --> KC[Keycloak]
                             GW --> Shop[쇼핑몰 - posselect.com]
 
-                            GW --> Monitor[모니터링 스택<br/>Prometheus/Grafana - 완료]
-                            Monitor --> AlertManager[Alertmanager 외부 알림<br/>Email/Slack 연동]
+                            GW --> Monitor[모니터링/로그 스택<br/>Prometheus/Grafana/Loki - 완료]
+                            Monitor --> AlertManager[Alertmanager<br/>Email 완료, Slack 계획]
 
                             GW --> Observability[관찰성 스택]
                             Observability --> Kiali[Kiali]
-                            Observability --> Jaeger[Jaeger]
+                            Observability --> Jaeger[Jaeger<br/>Java 백엔드 4개 완료]
 
                             GW --> Storage[스토리지]
                             Storage --> MinIO[MinIO]
-                            Storage --> Velero[Velero<br/>PVC 자동 백업]
+                            Storage --> Velero[Velero<br/>PVC 자동 백업 완료]
 
                             classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
                             classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
 
-                            class WP,RM,KC,Shop,MinIO,Traefik,GW,Monitor deployed
-                            class AlertManager,Kiali,Jaeger,Istio,Velero planned
+                            class WP,RM,KC,Shop,MinIO,Traefik,GW,Monitor,Jaeger,Velero,AlertManager deployed
+                            class Kiali,Istio planned
                     </div>
                 </div>
 
@@ -491,24 +525,29 @@
                         <div class="domains">monitoring.posselect.com — 2026-07-29 배포, 2026-08-02 posselect.com 이전 + 쇼핑몰 실제 서비스/DB/Redis 메트릭 연결 완료</div>
                         <span class="status-badge status-deployed">완료됨</span>
                     </div>
-                    <div class="service-card planned">
+                    <div class="service-card deployed">
+                        <h3>Loki / Promtail (로그 수집)</h3>
+                        <div class="domains">2026-08-04 완료 — 전 네임스페이스 로그, 보관 14일</div>
+                        <span class="status-badge status-deployed">완료됨</span>
+                    </div>
+                    <div class="service-card deployed">
                         <h3>Alertmanager 외부 알림</h3>
-                        <div class="domains">Email/Slack 채널 연동 — 알림 규칙은 있으나 실시간 통보 안 됨</div>
-                        <span class="status-badge status-planned">계획됨</span>
+                        <div class="domains">2026-08-04: Email 채널 연동 완료(자체 메일서버 경유). Slack 등 추가 채널은 아직 계획 단계</div>
+                        <span class="status-badge status-deployed">완료됨(Email)</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Jaeger (분산 트레이싱)</h3>
+                        <div class="domains">2026-08-04 완료 — Java 백엔드 4개 OTel 자동계측(HTTP+JDBC 스팬). Next.js 프론트 4개는 미계측, UI 미노출</div>
+                        <span class="status-badge status-deployed">완료됨</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>Velero (백업 자동화)</h3>
+                        <div class="domains">2026-08-04 완료 — 전 네임스페이스 매일 백업(보관 10일), MinIO 저장. restore 리허설은 아직 미검증</div>
+                        <span class="status-badge status-deployed">완료됨</span>
                     </div>
                     <div class="service-card planned">
                         <h3>Kiali</h3>
-                        <div class="domains">서비스 메시 관찰성</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>Jaeger</h3>
-                        <div class="domains">분산 트레이싱</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>Velero (백업 자동화)</h3>
-                        <div class="domains">PVC 자동 백업, 현재 미구축</div>
+                        <div class="domains">서비스 메시 관찰성 — Istio 의존이라 보류</div>
                         <span class="status-badge status-planned">계획됨</span>
                     </div>
                 </div>
