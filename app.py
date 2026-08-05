@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# 아키텍처 데이터 (2026-08-05 최신화 — Loki/Velero/Jaeger 관찰성 스택, 로그인 부가기능 반영)
+# 아키텍처 데이터 (2026-08-05 최신화 — Loki/Velero/Jaeger 관찰성 스택, 로그인 부가기능, MinIO design-assets 버킷/imgproxy CDN 실사용, posselect-ui 반영)
 architecture_data = {
     "current": {
         "title": "현재 K3s 클러스터 아키텍처 구조도 (실제 배포 상태)",
@@ -15,7 +15,7 @@ architecture_data = {
             "personal_line": [
                 {"name": "WordPress", "domains": ["leedohyun.com", "blog.leedohyun.com"], "status": "deployed"},
                 {"name": "Redmine", "domains": ["alm.leedohyun.com", "redmine.leedohyun.com"], "status": "deployed"},
-                {"name": "MinIO", "domains": ["minio.leedohyun.com", "static.leedohyun.com"], "status": "deployed"},
+                {"name": "MinIO", "domains": ["minio.leedohyun.com", "static.leedohyun.com"], "desc": "S3 호환 오브젝트 스토리지 — 개인용 버킷(book/common/image/web)뿐 아니라 posselect.com 쪽 shop-images/shop-static/design-assets 버킷도 같은 인스턴스를 공유", "status": "deployed"},
                 {"name": "Tool", "domains": ["tool.leedohyun.com"], "status": "deployed"},
                 {"name": "Architecture Web", "domains": ["architecture.leedohyun.com", "architecture.posselect.com"], "status": "deployed"},
                 {"name": "라우터 관리화면 프록시", "domains": ["router.leedohyun.com"], "status": "deployed"}
@@ -27,7 +27,9 @@ architecture_data = {
                 {"name": "order-api", "domains": ["/api/orders/** (customer.posselect.com, product.posselect.com)"], "desc": "주문/결제(mock), 로그인 시 계정에 자동 연결", "status": "deployed"},
                 {"name": "admin.front", "domains": ["admin.posselect.com"], "desc": "관리자 백오피스, Keycloak(staff realm) 로그인", "status": "deployed"},
                 {"name": "Keycloak", "domains": ["keycloak.posselect.com"], "desc": "SSO/OAuth2·OIDC — 2026-08-02부로 쇼핑몰 전용, 개인 서비스와 완전 분리", "status": "deployed"},
-                {"name": "Grafana (모니터링)", "domains": ["monitoring.posselect.com"], "desc": "2026-08-02: monitoring.leedohyun.com에서 이전, 쇼핑몰 전용 모니터링으로 재정의. gateway/auth-api/order-api/product-api의 /actuator/prometheus + postgres-exporter + redis-exporter를 실제로 스크레이핑", "status": "deployed"}
+                {"name": "Grafana (모니터링)", "domains": ["monitoring.posselect.com"], "desc": "2026-08-02: monitoring.leedohyun.com에서 이전, 쇼핑몰 전용 모니터링으로 재정의. gateway/auth-api/order-api/product-api의 /actuator/prometheus + postgres-exporter + redis-exporter를 실제로 스크레이핑", "status": "deployed"},
+                {"name": "imgproxy CDN", "domains": ["image.posselect.com (imgproxy 리사이징)", "static.posselect.com (MinIO 직접 서빙)"], "desc": "2026-08-05: 2026-08-02에 배포만 되어 있던 인프라(실사용 사례 없음)를 처음 실사용 — MinIO에 design-assets 버킷(브랜드 로고/파비콘 등) 신규 구축, 서명 URL로 imgproxy 경유 서빙", "status": "deployed"},
+                {"name": "posselect-ui", "domains": ["ui.posselect.com"], "desc": "디자인 시스템 레퍼런스 페이지(claude.ai 디자인 툴 standalone export를 nginx로 서빙). 2026-08-05: 브랜드 로고/파비콘 6종을 페이지에 통째로 임베드된 base64 대신 image.posselect.com CDN 참조로 전환", "status": "deployed"}
             ],
             "mail": [
                 {"name": "자체 메일서버 (docker-mailserver)", "domains": ["customer-service@leedohyun.com", "customer-service@posselect.com"], "desc": "인증메일/주문알림 발신, 두 도메인 모두 DKIM 서명", "status": "deployed"}
