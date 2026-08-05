@@ -17,7 +17,7 @@ architecture_data = {
                 {"name": "Redmine", "domains": ["alm.leedohyun.com", "redmine.leedohyun.com"], "status": "deployed"},
                 {"name": "MinIO", "domains": ["minio.leedohyun.com", "static.leedohyun.com"], "status": "deployed"},
                 {"name": "Tool", "domains": ["tool.leedohyun.com"], "status": "deployed"},
-                {"name": "Architecture Web", "domains": ["architecture.leedohyun.com"], "status": "deployed"},
+                {"name": "Architecture Web", "domains": ["architecture.leedohyun.com", "architecture.posselect.com"], "status": "deployed"},
                 {"name": "라우터 관리화면 프록시", "domains": ["router.leedohyun.com"], "status": "deployed"}
             ],
             "shop_line": [
