@@ -200,6 +200,7 @@
                 <div class="tab" onclick="showTab('infra')">공통 인프라</div>
                 <div class="tab" onclick="showTab('domainsplit')">도메인 구성</div>
                 <div class="tab" onclick="showTab('improved')">개선 계획</div>
+                <div class="tab" onclick="showTab('roadmap')">장기 로드맵</div>
                 <div class="tab" onclick="showTab('resources')">리소스 현황</div>
             </div>
             
@@ -615,6 +616,77 @@
                 </div>
             </div>
             
+            <div id="roadmap" class="tab-content">
+                <h2>장기 로드맵 — 클라우드 전환 및 대규모 확장 전제 (2026-08-06 확정)</h2>
+                <p style="color:#4a5568; line-height:1.6;">
+                    현재의 홈서버 K3s 단일 노드 시스템은 최종 형태가 아니라 <strong>과도기 상태</strong>로 간주한다.
+                    장기 계획은 서비스가 커지면 클라우드로 전환해서 대규모로 확장하는 것이며, 여기에는 이미지뿐
+                    아니라 비디오·실시간 라이브 스트리밍 제공까지 포함된다. 이 서버(Ryzen 5 1600, 6코어 단일 노드)는
+                    트랜스코딩/라이브 스트리밍 같은 CPU·대역폭 집약적 워크로드를 감당할 수 없으므로, 설계 시점부터
+                    이를 염두에 둔다.
+                </p>
+
+                <div class="diagram-container">
+                    <div class="mermaid">
+                        graph TB
+                            subgraph now["지금 — 홈서버 (과도기)"]
+                                direction TB
+                                MinIO2[MinIO<br/>shop/static, shop/image]
+                                ImgProxy[imgproxy<br/>이미지 가공]
+                            end
+
+                            subgraph later["나중 — 클라우드 전환 시점"]
+                                direction TB
+                                S3[S3 호환 스토리지<br/>동일한 키 구조 그대로 이전]
+                                CDN2[CloudFront / Cloudflare<br/>단일 cdn.posselect.com + 경로 구분]
+                            end
+
+                            subgraph newcap["신규 기능 — 처음부터 클라우드로"]
+                                direction TB
+                                Video[VOD<br/>Cloudflare Stream / Mux 등]
+                                Live[라이브 스트리밍<br/>AWS IVS / MediaConvert 등]
+                            end
+
+                            now -.->|"이름/URL 체계는 유지, 백엔드만 교체"| later
+
+                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
+                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
+
+                            class MinIO2,ImgProxy deployed
+                            class S3,CDN2,Video,Live planned
+                    </div>
+                </div>
+
+                <div class="service-grid">
+                    <div class="service-card deployed">
+                        <h3>이름/URL 계약 층과 백엔드 인프라 층 분리</h3>
+                        <div class="domains">오브젝트 스토리지의 버킷/prefix 이름, URL 경로 구조를 특정 백엔드(MinIO)에 종속되지 않게 설계 — MinIO가 S3 API 호환이라 지금 짓는 키 이름이 이미 실제 S3 키인 것처럼 설계하면, 나중에 백엔드만(MinIO→S3, imgproxy→CloudFront 등) 교체하는 lift-and-shift가 가능해짐</div>
+                        <span class="status-badge status-deployed">원칙 확정</span>
+                    </div>
+                    <div class="service-card deployed">
+                        <h3>쇼핑몰 CDN 버킷/prefix 명명 규칙</h3>
+                        <div class="domains">shop/static/ (정적 빌드 자산), shop/image/ (상품·브랜드 이미지, imgproxy 가공)</div>
+                        <div class="domains">짧고 콘텐츠 타입 기준이라 나중에 shop/video/, shop/live/를 옆에 붙일 수 있음. design-assets 버킷(브랜드 자산 전용)은 이 구조와 별개로 유지</div>
+                        <span class="status-badge status-deployed">확정</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>VOD (주문형 비디오)</h3>
+                        <div class="domains">자체 호스팅 대신 처음부터 매니지드 클라우드 서비스로(Cloudflare Stream, Mux 등) — 트랜스코딩은 CPU 집약적이라 단일 노드로 감당 불가, 자체 호스팅 후 재이전하는 이중 작업을 피함</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>실시간 라이브 스트리밍</h3>
+                        <div class="domains">AWS IVS/MediaConvert 등 매니지드 서비스 — 저지연 인제스트+실시간 트랜스코딩+엣지 분산까지 필요해 홈서버로는 사실상 불가능한 영역</div>
+                        <span class="status-badge status-planned">계획됨</span>
+                    </div>
+                    <div class="service-card planned">
+                        <h3>서브도메인 → 단일 CDN 도메인 통합</h3>
+                        <div class="domains">지금은 image.posselect.com/static.posselect.com처럼 종류별 서브도메인이지만, 실제 대규모 이커머스(Shopify, Amazon)는 단일 CDN 도메인 + 경로(path) prefix로 구분하는 패턴을 씀. video 추가 시점이나 실제 클라우드 이전 시점에 cdn.posselect.com/&lt;type&gt;/... 형태로 통합을 고려 — 지금 당장 갈아엎을 필요는 없음</div>
+                        <span class="status-badge status-planned">검토 대상</span>
+                    </div>
+                </div>
+            </div>
+
             <div id="resources" class="tab-content">
                 <h2>리소스 현황</h2>
                 
