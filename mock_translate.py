@@ -180,7 +180,9 @@ mermaid_dict = {
     "경로 구분": {"en": "Path Routing", "ja": "パスルーティング", "zh": "路径路由"},
     "신규 기능 — 처음부터 클라우드로": {"en": "New Feature - Cloud Native", "ja": "新機能 - 最初からクラウドへ", "zh": "新功能 - 云原生"},
     "라이브 스트리밍": {"en": "Live Streaming", "ja": "ライブストリーミング", "zh": "直播"},
-    "이름/URL 체계는 유지, 백엔드만 교체": {"en": "Keep Name/URL scheme, replace backend", "ja": "名前/URL体系は維持、バックエンドのみ交換", "zh": "保持名称/URL体系，仅替换后端"}
+    "이름/URL 체계는 유지, 백엔드만 교체": {"en": "Keep Name/URL scheme, replace backend", "ja": "名前/URL体系は維持、バックエンドのみ交換", "zh": "保持名称/URL体系，仅替换后端"},
+    "Cloudflare Stream / Mux 등": {"en": "Cloudflare Stream / Mux, etc.", "ja": "Cloudflare Stream / Mux 等", "zh": "Cloudflare Stream / Mux 等"},
+    "AWS IVS / MediaConvert 등": {"en": "AWS IVS / MediaConvert, etc.", "ja": "AWS IVS / MediaConvert 等", "zh": "AWS IVS / MediaConvert 等"}
 }
 
 def mock_translate_mermaid(data, lang):
@@ -189,8 +191,10 @@ def mock_translate_mermaid(data, lang):
         return {k: mock_translate_mermaid(v, lang) for k, v in data.items()}
     elif isinstance(data, str):
         res = data
-        for k, v in mermaid_dict.items():
-            res = res.replace(k, v[lang_key])
+        # Sort keys by length descending to prevent partial replacements
+        sorted_keys = sorted(mermaid_dict.keys(), key=len, reverse=True)
+        for k in sorted_keys:
+            res = res.replace(k, mermaid_dict[k][lang_key])
         return res
     return data
 
