@@ -112,14 +112,68 @@ ui_translations = {
 with open("data/ko.json", "r", encoding="utf-8") as f:
     ko_data = json.load(f)
 
-import re
+mermaid_dict = {
+    "인터넷": {"en": "Internet", "ja": "インターネット", "zh": "互联网"},
+    "가정용 라우터": {"en": "Home Router", "ja": "家庭用ルーター", "zh": "家用路由器"},
+    "포트포워딩": {"en": "Port Forwarding", "ja": "ポート転送", "zh": "端口转发"},
+    "IP 공유": {"en": "IP Sharing", "ja": "IP共有", "zh": "IP共享"},
+    "과 공용 진입점": {"en": " Shared Entrypoint", "ja": " 共有エントリポイント", "zh": " 共享入口"},
+    "자세한 건 '공통 인프라' 탭": {"en": "See 'Common Infra' tab", "ja": "詳細は「共通インフラ」タブへ", "zh": "详见“通用基础设施”标签页"},
+    "버킷": {"en": "Bucket", "ja": "バケット", "zh": "存储桶"},
+    "탭과 동일 인스턴스": {"en": "Same instance as tab", "ja": "タブと同じインスタンス", "zh": "与标签页相同实例"},
+    "서명 URL": {"en": "Signed URL", "ja": "署名付きURL", "zh": "签名URL"},
+    "메트릭 스크레이핑": {"en": "Metric Scraping", "ja": "メトリクススクレイピング", "zh": "指标抓取"},
+    "익스포터 경유": {"en": "Via Exporter", "ja": "エクスポーター経由", "zh": "通过Exporter"},
+    "장바구니": {"en": "Cart", "ja": "カート", "zh": "购物车"},
+    "지금 보고 계신 이 페이지": {"en": "This page you are viewing", "ja": "現在ご覧のページ", "zh": "您当前正在查看的页面"},
+    "라우터 관리화면 프록시": {"en": "Router Admin Proxy", "ja": "ルーター管理プロキシ", "zh": "路由器管理代理"},
+    "두 도메인 공용 진입점": {"en": "Two domains Shared Entrypoint", "ja": "両ドメイン共有エントリポイント", "zh": "两个域名共享入口"},
+    "자체 메일서버": {"en": "Self-hosted Mail", "ja": "自前メールサーバー", "zh": "自建邮件服务器"},
+    "메일 발송": {"en": "Send mail", "ja": "メール送信", "zh": "发送邮件"},
+    "알림": {"en": "Alert", "ja": "通知", "zh": "警报"},
+    "로그 수집": {"en": "Log Collection", "ja": "ログ収集", "zh": "日志收集"},
+    "분산 트레이싱": {"en": "Distributed Tracing", "ja": "分散トレーシング", "zh": "分布式追踪"},
+    "백업": {"en": "Backup", "ja": "バックアップ", "zh": "备份"},
+    "전 네임스페이스": {"en": "All Namespaces", "ja": "全ネームスペース", "zh": "所有命名空间"},
+    "에 저장": {"en": " saved to", "ja": " に保存", "zh": " 保存至"},
+    "이전:": {"en": "Before:", "ja": "以前:", "zh": "以前:"},
+    "단일 도메인": {"en": "Single Domain", "ja": "単一ドメイン", "zh": "单一域名"},
+    "현재: 도메인 분리": {"en": "Current: Domain Split", "ja": "現在: ドメイン分離", "zh": "当前: 域名分离"},
+    "개인 전용": {"en": "Personal Use", "ja": "個人専用", "zh": "个人专用"},
+    "쇼핑몰 전용": {"en": "Shop Use", "ja": "ショップ専用", "zh": "商城专用"},
+    "전환": {"en": "Transition", "ja": "移行", "zh": "迁移"},
+    "개인 라우터": {"en": "Personal Router", "ja": "個人ルーター", "zh": "个人路由器"},
+    "단일 진입점 - 이미 완료": {"en": "Single Entrypoint - Completed", "ja": "単一エントリポイント - 完了", "zh": "单一入口 - 已完成"},
+    "서비스 메시": {"en": "Service Mesh", "ja": "サービスメッシュ", "zh": "服务网格"},
+    "쇼핑몰 -": {"en": "Shop -", "ja": "ショップ -", "zh": "商城 -"},
+    "모니터링/로그 스택": {"en": "Monitor/Log Stack", "ja": "監視/ログスタック", "zh": "监控/日志栈"},
+    "완료, Slack 계획": {"en": "Completed, Slack planned", "ja": "完了、Slack計画中", "zh": "已完成，计划支持Slack"},
+    "완료": {"en": "Completed", "ja": "完了", "zh": "已完成"},
+    "관찰성 스택": {"en": "Observability Stack", "ja": "可観測性スタック", "zh": "可观测性栈"},
+    "Java 백엔드 4개 완료": {"en": "Java Backend 4 Completed", "ja": "Javaバックエンド4つ完了", "zh": "4个Java后端已完成"},
+    "스토리지": {"en": "Storage", "ja": "ストレージ", "zh": "存储"},
+    "자동 백업 완료": {"en": "Auto Backup Completed", "ja": "自動バックアップ完了", "zh": "自动备份完成"},
+    "지금 — 홈서버 (과도기)": {"en": "Now - Home Server (Transitional)", "ja": "現在 - ホームサーバー（過渡期）", "zh": "现在 - 家庭服务器（过渡期）"},
+    "이미지 가공": {"en": "Image Processing", "ja": "画像処理", "zh": "图像处理"},
+    "나중 — 클라우드 전환 시점": {"en": "Later - Cloud Transition", "ja": "将来 - クラウド移行時", "zh": "未来 - 云端迁移时"},
+    "호환 스토리지": {"en": "Compatible Storage", "ja": "互換ストレージ", "zh": "兼容存储"},
+    "동일한 키 구조 그대로 이전": {"en": "Migrate with same key structure", "ja": "同じキー構造で移行", "zh": "使用相同的键结构迁移"},
+    "단일": {"en": "Single", "ja": "単一", "zh": "单一"},
+    "경로 구분": {"en": "Path Routing", "ja": "パスルーティング", "zh": "路径路由"},
+    "신규 기능 — 처음부터 클라우드로": {"en": "New Feature - Cloud Native", "ja": "新機能 - 最初からクラウドへ", "zh": "新功能 - 云原生"},
+    "라이브 스트리밍": {"en": "Live Streaming", "ja": "ライブストリーミング", "zh": "直播"},
+    "이름/URL 체계는 유지, 백엔드만 교체": {"en": "Keep Name/URL scheme, replace backend", "ja": "名前/URL体系は維持、バックエンドのみ交換", "zh": "保持名称/URL体系，仅替换后端"}
+}
 
-def mock_translate_mermaid(data, lang_prefix):
+def mock_translate_mermaid(data, lang):
+    lang_key = lang.lower()
     if isinstance(data, dict):
-        return {k: mock_translate_mermaid(v, lang_prefix) for k, v in data.items()}
+        return {k: mock_translate_mermaid(v, lang) for k, v in data.items()}
     elif isinstance(data, str):
-        # mermaid 구문을 깨지 않도록 한글 부분만 치환 (괄호 사용을 피하여 다이어그램 모양 변경 방지)
-        return re.sub(r'([가-힣][가-힣\s]*[가-힣]|[가-힣])', rf'{lang_prefix}: \1', data)
+        res = data
+        for k, v in mermaid_dict.items():
+            res = res.replace(k, v[lang_key])
+        return res
     return data
 
 for lang in ["en", "ja", "zh"]:
