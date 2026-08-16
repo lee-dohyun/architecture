@@ -31,7 +31,10 @@
     "resource_memory": "メモリ 使用率",
     "resource_nodes": "ノード数",
     "resource_type": "クラスター タイプ",
-    "no_image": "画像なし"
+    "no_image": "画像なし",
+    "infra_desc": "Spring Cloud Gatewayをはじめ、クラスターインフラ、監視・ログ・トレース・バックアップ、メールサーバー、CI/CDはleedohyun.comとposselect.comで共有されています。ドメインごとの構成図で毎回繰り返すと分かりにくくなるため、別タブに分けています。",
+    "domain_split_title": "ドメイン再構成：leedohyun.com（個人） / posselect.com（ショッピングモール）の分離 (2026-08-02)",
+    "roadmap_title": "長期ロードマップ — クラウド移行および大規模拡張を前提 (2026-08-06確定)"
   },
   "data": {
     "current": {

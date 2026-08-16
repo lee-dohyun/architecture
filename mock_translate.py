@@ -55,7 +55,10 @@ ui_translations = {
         "resource_memory": "Memory Usage",
         "resource_nodes": "Node Count",
         "resource_type": "Cluster Type",
-        "no_image": "No Image"
+        "no_image": "No Image",
+        "infra_desc": "Spring Cloud Gateway, Cluster Infrastructure, Monitoring/Log/Tracing/Backup, Mail Server, and CI/CD are shared between leedohyun.com and posselect.com. To avoid repeating these in each domain's diagram, they are separated into this tab.",
+        "domain_split_title": "Domain Split: leedohyun.com (Personal) / posselect.com (Shop) separation (2026-08-02)",
+        "roadmap_title": "Long-term Roadmap — Assuming Cloud Transition and Large-scale Expansion (Confirmed 2026-08-06)"
     },
     "ja": {
         "title": "MSA アーキテクチャ図",
@@ -89,7 +92,10 @@ ui_translations = {
         "resource_memory": "メモリ 使用率",
         "resource_nodes": "ノード数",
         "resource_type": "クラスター タイプ",
-        "no_image": "画像なし"
+        "no_image": "画像なし",
+        "infra_desc": "Spring Cloud Gatewayをはじめ、クラスターインフラ、監視・ログ・トレース・バックアップ、メールサーバー、CI/CDはleedohyun.comとposselect.comで共有されています。ドメインごとの構成図で毎回繰り返すと分かりにくくなるため、別タブに分けています。",
+        "domain_split_title": "ドメイン再構成：leedohyun.com（個人） / posselect.com（ショッピングモール）の分離 (2026-08-02)",
+        "roadmap_title": "長期ロードマップ — クラウド移行および大規模拡張を前提 (2026-08-06確定)"
     },
     "zh": {
         "title": "MSA 架构图",
@@ -123,7 +129,10 @@ ui_translations = {
         "resource_memory": "内存 使用率",
         "resource_nodes": "节点数量",
         "resource_type": "集群类型",
-        "no_image": "无图片"
+        "no_image": "无图片",
+        "infra_desc": "Spring Cloud Gateway 以及集群基础设施、监控/日志/追踪/备份、邮件服务器、CI/CD 由 leedohyun.com 和 posselect.com 共享。为了避免在每个域的架构图中重复这些内容，将它们单独放在此标签页中。",
+        "domain_split_title": "域名结构重组：leedohyun.com(个人) / posselect.com(商城) 分离 (2026-08-02)",
+        "roadmap_title": "长期路线图 — 以云端迁移及大规模扩展为前提 (2026-08-06 确定)"
     }
 }
 

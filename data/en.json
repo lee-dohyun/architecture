@@ -31,7 +31,10 @@
     "resource_memory": "Memory Usage",
     "resource_nodes": "Node Count",
     "resource_type": "Cluster Type",
-    "no_image": "No Image"
+    "no_image": "No Image",
+    "infra_desc": "Spring Cloud Gateway, Cluster Infrastructure, Monitoring/Log/Tracing/Backup, Mail Server, and CI/CD are shared between leedohyun.com and posselect.com. To avoid repeating these in each domain's diagram, they are separated into this tab.",
+    "domain_split_title": "Domain Split: leedohyun.com (Personal) / posselect.com (Shop) separation (2026-08-02)",
+    "roadmap_title": "Long-term Roadmap — Assuming Cloud Transition and Large-scale Expansion (Confirmed 2026-08-06)"
   },
   "data": {
     "current": {
