@@ -241,7 +241,7 @@
                     <div class="mermaid">{{ t.mermaid.roadmap | safe }}</div>
                 </div>
                 <div class="service-grid">
-                    {% for svc in t.data.roadmap.items %}
+                    {% for svc in t.data.roadmap['items'] %}
                         {{ service_card(svc) }}
                     {% endfor %}
                 </div>
