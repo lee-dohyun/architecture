@@ -117,6 +117,8 @@ for lang in ["en", "ja", "zh"]:
     lang_data = mock_translate(ko_data, lang.upper())
     # UI 부분은 실제 번역으로 덮어쓰기
     lang_data["ui"] = ui_translations[lang]
+    # mermaid 다이어그램은 임의로 번역 시 [EN] 등이 붙어 Syntax Error가 발생하므로 원본을 유지함
+    lang_data["mermaid"] = ko_data["mermaid"]
     
     with open(f"data/{lang}.json", "w", encoding="utf-8") as f:
         json.dump(lang_data, f, ensure_ascii=False, indent=2)
