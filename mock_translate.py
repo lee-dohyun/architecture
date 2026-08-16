@@ -28,9 +28,15 @@ ui_translations = {
         "subtitle": "K3s Cluster Microservices Architecture Status and Improvement Plan",
         "last_updated": "Last Updated: ",
         "tab_posselect": "posselect.com",
+        "tab_posselect_desc": " — Shopping Mall Service",
         "tab_leedohyun": "leedohyun.com",
+        "tab_leedohyun_desc": " — Personal Service",
         "tab_infra": "Common Infra",
+        "tab_infra_desc": " — Shared by both domains",
         "tab_domainsplit": "Domain Split",
+        "domain_split_personal": "leedohyun.com — Personal Use",
+        "domain_split_shop": "posselect.com — Shopping Mall Use",
+        "domain_split_compat": "Legacy Domain Compatibility",
         "tab_improved": "Improvement Plan",
         "tab_roadmap": "Long-term Roadmap",
         "tab_resources": "Resource Status",
@@ -56,9 +62,15 @@ ui_translations = {
         "subtitle": "K3s クラスター マイクロサービス アーキテクチャの現状と改善計画",
         "last_updated": "最終更新: ",
         "tab_posselect": "posselect.com",
+        "tab_posselect_desc": " — ショッピングモールサービス",
         "tab_leedohyun": "leedohyun.com",
+        "tab_leedohyun_desc": " — 個人サービス",
         "tab_infra": "共通インフラ",
+        "tab_infra_desc": " — 両ドメインで共有するもの",
         "tab_domainsplit": "ドメイン構成",
+        "domain_split_personal": "leedohyun.com — 個人専用",
+        "domain_split_shop": "posselect.com — ショッピングモール専用",
+        "domain_split_compat": "旧ドメインの互換性",
         "tab_improved": "改善計画",
         "tab_roadmap": "長期ロードマップ",
         "tab_resources": "リソース状況",
@@ -84,9 +96,15 @@ ui_translations = {
         "subtitle": "K3s 集群微服务架构现状及改进计划",
         "last_updated": "最后更新: ",
         "tab_posselect": "posselect.com",
+        "tab_posselect_desc": " — 商城服务",
         "tab_leedohyun": "leedohyun.com",
+        "tab_leedohyun_desc": " — 个人服务",
         "tab_infra": "公共基础设施",
+        "tab_infra_desc": " — 两个域名共用的部分",
         "tab_domainsplit": "域名结构",
+        "domain_split_personal": "leedohyun.com — 个人专用",
+        "domain_split_shop": "posselect.com — 商城专用",
+        "domain_split_compat": "旧域名兼容性",
         "tab_improved": "改进计划",
         "tab_roadmap": "长期路线图",
         "tab_resources": "资源状况",
@@ -176,13 +194,23 @@ def mock_translate_mermaid(data, lang):
         return res
     return data
 
+import os
+
 for lang in ["en", "ja", "zh"]:
-    # 깊은 복사 후 모의 번역
+    # 깊은 복사 후 모의 번역 (fallback)
     lang_data = mock_translate(ko_data, lang.upper())
+    
     # UI 부분은 실제 번역으로 덮어쓰기
     lang_data["ui"] = ui_translations[lang]
+    
+    # 실제 데이터 번역본이 있으면 덮어쓰기
+    data_file = f"data/{lang}_data.json"
+    if os.path.exists(data_file):
+        with open(data_file, "r", encoding="utf-8") as df:
+            lang_data["data"] = json.load(df)
+            
     # mermaid 다이어그램은 정규식을 이용해 한글 부분만 안전하게 번역 모의
-    lang_data["mermaid"] = mock_translate_mermaid(ko_data["mermaid"], lang.upper())
+    lang_data["mermaid"] = mock_translate_mermaid(ko_data["mermaid"], lang)
     
     with open(f"data/{lang}.json", "w", encoding="utf-8") as f:
         json.dump(lang_data, f, ensure_ascii=False, indent=2)

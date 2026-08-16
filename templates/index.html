@@ -117,10 +117,9 @@
             {% endmacro %}
 
             <div id="posselect" class="tab-content active">
-                <h2>{{ t.ui.tab_posselect }} — 쇼핑몰 서비스</h2>
+                <h2>{{ t.ui.tab_posselect }}{{ t.ui.tab_posselect_desc }}</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">graph TB
-{{ t.mermaid.posselect | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.posselect | safe }}</div>
                 </div>
                 <div class="service-grid">
                     {% for svc in t.data.current.services.shop_line %}
@@ -136,10 +135,9 @@
             </div>
 
             <div id="leedohyun" class="tab-content">
-                <h2>{{ t.ui.tab_leedohyun }} — 개인 서비스</h2>
+                <h2>{{ t.ui.tab_leedohyun }}{{ t.ui.tab_leedohyun_desc }}</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">graph TB
-{{ t.mermaid.leedohyun | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.leedohyun | safe }}</div>
                 </div>
                 <div class="service-grid">
                     {% for svc in t.data.current.services.personal_line %}
@@ -155,11 +153,10 @@
             </div>
 
             <div id="infra" class="tab-content">
-                <h2>{{ t.ui.tab_infra }} — 두 도메인이 함께 쓰는 것들</h2>
+                <h2>{{ t.ui.tab_infra }}{{ t.ui.tab_infra_desc }}</h2>
                 <p style="color:#4a5568; line-height:1.6;">{{ t.ui.infra_desc }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">graph TB
-{{ t.mermaid.infra | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.infra | safe }}</div>
                 </div>
                 <div class="service-grid">
                     {% for svc in t.data.current.services.gateway %}
@@ -192,26 +189,25 @@
                 <h2>{{ t.ui.domain_split_title }}</h2>
                 <p style="color:#4a5568; line-height:1.6;">{{ t.data.domain_split.summary }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">graph LR
-{{ t.mermaid.domainsplit | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.domainsplit | safe }}</div>
                 </div>
                 <div class="service-grid">
                     <div class="service-card deployed">
-                        <h3>leedohyun.com — 개인 전용</h3>
+                        <h3>{{ t.ui.domain_split_personal }}</h3>
                         {% for domain in t.data.domain_split.leedohyun_com %}
                         <div class="domains">{{ domain }}</div>
                         {% endfor %}
                         <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
                     <div class="service-card deployed">
-                        <h3>posselect.com — 쇼핑몰 전용</h3>
+                        <h3>{{ t.ui.domain_split_shop }}</h3>
                         {% for domain in t.data.domain_split.posselect_com %}
                         <div class="domains">{{ domain }}</div>
                         {% endfor %}
                         <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
                     <div class="service-card deployed">
-                        <h3>구 도메인 호환성</h3>
+                        <h3>{{ t.ui.domain_split_compat }}</h3>
                         <div class="domains">{{ t.data.domain_split.backward_compat }}</div>
                         <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
@@ -229,8 +225,7 @@
             <div id="improved" class="tab-content">
                 <h2>{{ t.ui.tab_improved }}</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">graph TB
-{{ t.mermaid.improved | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.improved | safe }}</div>
                 </div>
                 <div class="service-grid">
                     {% for svc in t.data.improved %}
@@ -243,11 +238,10 @@
                 <h2>{{ t.ui.roadmap_title }}</h2>
                 <p style="color:#4a5568; line-height:1.6;">{{ t.data.roadmap.desc }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">graph TB
-{{ t.mermaid.roadmap | safe }}</div>
+                    <div class="mermaid">{{ t.mermaid.roadmap | safe }}</div>
                 </div>
                 <div class="service-grid">
-                    {% for svc in t.data.roadmap['items'] %}
+                    {% for svc in t.data.roadmap.items %}
                         {{ service_card(svc) }}
                     {% endfor %}
                 </div>
