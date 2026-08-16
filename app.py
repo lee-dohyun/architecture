@@ -21,14 +21,14 @@ def load_lang_data(lang):
 @app.route('/')
 def index_ko():
     data = load_lang_data('ko')
-    return render_template('index.html', t=data, lang='ko')
+    return render_template('index.html', t=data, lang='ko', data=data.get('data', {}))
 
 @app.route('/<lang>/')
 def index_lang(lang):
     if lang not in SUPPORTED_LANGS:
         return redirect(url_for('index_ko'))
     data = load_lang_data(lang)
-    return render_template('index.html', t=data, lang=lang)
+    return render_template('index.html', t=data, lang=lang, data=data.get('data', {}))
 
 @app.route('/api/architecture')
 def api_architecture():
