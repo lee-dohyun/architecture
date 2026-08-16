@@ -112,13 +112,23 @@ ui_translations = {
 with open("data/ko.json", "r", encoding="utf-8") as f:
     ko_data = json.load(f)
 
+import re
+
+def mock_translate_mermaid(data, lang_prefix):
+    if isinstance(data, dict):
+        return {k: mock_translate_mermaid(v, lang_prefix) for k, v in data.items()}
+    elif isinstance(data, str):
+        # mermaid 구문을 깨지 않도록 한글 부분만 치환 (괄호 사용을 피하여 다이어그램 모양 변경 방지)
+        return re.sub(r'([가-힣][가-힣\s]*[가-힣]|[가-힣])', rf'{lang_prefix}: \1', data)
+    return data
+
 for lang in ["en", "ja", "zh"]:
     # 깊은 복사 후 모의 번역
     lang_data = mock_translate(ko_data, lang.upper())
     # UI 부분은 실제 번역으로 덮어쓰기
     lang_data["ui"] = ui_translations[lang]
-    # mermaid 다이어그램은 임의로 번역 시 [EN] 등이 붙어 Syntax Error가 발생하므로 원본을 유지함
-    lang_data["mermaid"] = ko_data["mermaid"]
+    # mermaid 다이어그램은 정규식을 이용해 한글 부분만 안전하게 번역 모의
+    lang_data["mermaid"] = mock_translate_mermaid(ko_data["mermaid"], lang.upper())
     
     with open(f"data/{lang}.json", "w", encoding="utf-8") as f:
         json.dump(lang_data, f, ensure_ascii=False, indent=2)
