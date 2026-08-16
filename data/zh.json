@@ -29,13 +29,13 @@
   },
   "data": {
     "current": {
-      "title": "[ZH] 현재 K3s 클러스터 아키텍처 구조도 (실제 배포 상태)",
+      "title": "当前K3s集群架构图（实际部署状态）",
       "services": {
         "gateway": [
           {
             "name": "Spring Cloud Gateway",
             "domains": [
-              "[ZH] *.leedohyun.com 전체 + *.posselect.com 전체의 실제 진입점 (단일 게이트웨이 공유)"
+              "所有 *.leedohyun.com + 所有 *.posselect.com 的实际入口点（共享单个网关）"
             ],
             "status": "deployed"
           }
@@ -63,7 +63,7 @@
               "minio.leedohyun.com",
               "static.leedohyun.com"
             ],
-            "desc": "[ZH] S3 호환 오브젝트 스토리지. 개인용 및 쇼핑몰 공용 인스턴스.",
+            "desc": "兼容S3的对象存储。个人和商城共用实例。",
             "status": "deployed"
           },
           {
@@ -82,7 +82,7 @@
             "status": "deployed"
           },
           {
-            "name": "[ZH] 라우터 관리화면 프록시",
+            "name": "路由器管理界面代理",
             "domains": [
               "router.leedohyun.com"
             ],
@@ -95,7 +95,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "[ZH] 쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료.",
+            "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。",
             "status": "deployed"
           },
           {
@@ -103,7 +103,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "[ZH] 로그인/회원가입/정보수정 기능. 이용약관 및 개인정보방침 백엔드 저장 처리.",
+            "desc": "登录/注册/修改信息功能。服务条款和隐私政策后端保存处理完毕。",
             "status": "deployed"
           },
           {
@@ -111,7 +111,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "[ZH] 상품 목록 및 장바구니. 상품 정보 API 캐싱 적용 완료.",
+            "desc": "商品列表和购物车。商品信息API缓存应用完成。",
             "status": "deployed"
           },
           {
@@ -119,7 +119,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "[ZH] 주문/결제 처리(Mock). 계정 자동 연결.",
+            "desc": "订单/支付处理（Mock）。自动关联账户。",
             "status": "deployed"
           },
           {
@@ -127,7 +127,7 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "[ZH] 관리자 백오피스. Keycloak(staff realm) 로그인.",
+            "desc": "管理员后台。Keycloak（staff领域）登录。",
             "status": "deployed"
           },
           {
@@ -135,33 +135,33 @@
             "domains": [
               "keycloak.posselect.com"
             ],
-            "desc": "[ZH] 쇼핑몰 전용 SSO/OAuth2·OIDC 인증 서버.",
+            "desc": "商城专用SSO/OAuth2·OIDC认证服务器。",
             "status": "deployed"
           },
           {
-            "name": "[ZH] Grafana (모니터링)",
+            "name": "Grafana (监控)",
             "domains": [
               "monitoring.posselect.com"
             ],
-            "desc": "[ZH] 쇼핑몰 전용 모니터링. 게이트웨이 및 API 메트릭 스크레이핑.",
+            "desc": "商城专用监控。网关及API指标抓取。",
             "status": "deployed"
           },
           {
             "name": "imgproxy CDN",
             "domains": [
-              "[ZH] image.posselect.com (imgproxy 리사이징)",
-              "[ZH] static.posselect.com (MinIO 직접 서빙)"
+              "image.posselect.com (imgproxy 调整大小)",
+              "static.posselect.com (MinIO 直接提供)"
             ],
-            "desc": "[ZH] 이미지 동적 리사이징 서버. MinIO 기반 서명 URL 제공.",
+            "desc": "动态图像调整大小服务器。提供基于MinIO的签名URL。",
             "status": "deployed"
           },
           {
             "name": "posselect-ui",
             "domains": [
               "storybook.posselect.com",
-              "[ZH] ui.posselect.com (별칭)"
+              "ui.posselect.com (别名)"
             ],
-            "desc": "[ZH] 디자인 시스템 레퍼런스 페이지. 반응형·다국어 컴포넌트, 접근성 검사 등 Storybook 환경 개선 완료.",
+            "desc": "设计系统参考页面。完成Storybook环境改进，如响应式/多语言组件、可访问性检查等。",
             "status": "deployed"
           },
           {
@@ -169,18 +169,18 @@
             "domains": [
               "shell.posselect.com"
             ],
-            "desc": "[ZH] 공통 헤더/푸터 및 카테고리 런타임 셸 (정적 서빙).",
+            "desc": "公共页眉/页脚和分类抽屉的运行时Shell（静态服务）。",
             "status": "deployed"
           }
         ],
         "mail": [
           {
-            "name": "[ZH] 자체 메일서버 (docker-mailserver)",
+            "name": "自建邮件服务器 (docker-mailserver)",
             "domains": [
               "customer-service@leedohyun.com",
               "customer-service@posselect.com"
             ],
-            "desc": "[ZH] 인증메일/주문알림 발신, 두 도메인 모두 DKIM 서명",
+            "desc": "发送验证邮件/订单通知，两个域名均已配置DKIM签名",
             "status": "deployed"
           }
         ],
@@ -211,7 +211,7 @@
           {
             "name": "PostgreSQL (postgres-service, customer ns)",
             "services": [
-              "[ZH] 레거시, 인증 목적 미사용"
+              "遗留，不用于身份验证"
             ],
             "status": "deployed"
           }
@@ -227,7 +227,7 @@
           {
             "name": "Redis (customer ns)",
             "services": [
-              "[ZH] product-api 장바구니"
+              "product-api 购物车"
             ],
             "status": "deployed"
           }
@@ -238,7 +238,7 @@
             "status": "deployed"
           },
           {
-            "name": "[ZH] cert-manager (와일드카드 *.leedohyun.com + *.posselect.com, 2개 도메인 각각 별도 Certificate)",
+            "name": "cert-manager (通配符 *.leedohyun.com + *.posselect.com，两个域名分别有独立的证书)",
             "status": "deployed"
           },
           {
@@ -255,59 +255,59 @@
           },
           {
             "name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)",
-            "desc": "[ZH] Prometheus/Grafana/Alertmanager 모니터링 스택. Email 알림 연동.",
+            "desc": "Prometheus/Grafana/Alertmanager 监控栈。Email警报集成。",
             "status": "deployed"
           },
           {
             "name": "Loki / Promtail",
-            "desc": "[ZH] 전 네임스페이스 컨테이너 로그 수집.",
+            "desc": "所有命名空间的全局容器日志收集。",
             "status": "deployed"
           },
           {
-            "name": "[ZH] Jaeger (분산 트레이싱)",
-            "desc": "[ZH] Java 백엔드 분산 트레이싱 (OTel).",
+            "name": "Jaeger (分布式追踪)",
+            "desc": "Java后端分布式追踪（OTel）。",
             "status": "deployed"
           },
           {
-            "name": "[ZH] Velero (백업 자동화)",
-            "desc": "[ZH] MinIO 기반 PVC 데이터 일일 백업 자동화.",
+            "name": "Velero (备份自动化)",
+            "desc": "基于MinIO的PVC数据每日自动备份。",
             "status": "deployed"
           }
         ],
         "cicd": [
           {
-            "name": "[ZH] GitHub Actions CI (이미지 빌드+푸시)",
-            "scope": "[ZH] 전 저장소",
+            "name": "GitHub Actions CI (镜像构建+推送)",
+            "scope": "所有仓库",
             "status": "deployed"
           },
           {
-            "name": "[ZH] self-hosted runner 기반 CD (자동 배포)",
+            "name": "基于self-hosted runner的CD (自动部署)",
             "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
             "status": "deployed"
           },
           {
-            "name": "[ZH] 수동 배포",
-            "scope": "[ZH] architecture-web, wordpress, tool 등",
+            "name": "手动部署",
+            "scope": "architecture-web, wordpress, tool等",
             "status": "manual"
           }
         ]
       },
       "issues": [
-        "[ZH] 보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)",
-        "[ZH] 분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
-        "[ZH] 단일 장애점 (단일 노드 클러스터, 이중화 없음)",
-        "[ZH] Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",
-        "[ZH] 자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음 (구조적 한계)",
-        "[ZH] architecture-web/tool/wordpress는 여전히 수동 배포",
-        "[ZH] customer.front 간편 로그인(카카오/네이버/구글) 구현 및 휴대폰 본인인증 백엔드 연동 필요",
-        "[ZH] Velero 주기적(3개월 등) 복구 재검증 루틴 필요"
+        "未应用安全加固（RBAC细分、NetworkPolicy、Istio mTLS — 仅存在计划文档）",
+        "分布式追踪仅测量了4个Java后端（Next.js前端未测量），Kiali/服务网格可观测性仍然缺失",
+        "单点故障（单节点集群，无冗余）",
+        "Alertmanager仅集成了Email，Slack等额外频道尚未集成",
+        "自建邮件服务器因家庭动态IP+无PTR设置，存在进入垃圾邮件箱的可能性（结构性限制）",
+        "architecture-web/tool/wordpress仍然手动部署",
+        "customer.front需要实现社交登录（Kakao/Naver/Google）及手机身份验证后端对接",
+        "Velero需要定期（如3个月）的恢复重新验证例程"
       ]
     },
     "domain_split": {
-      "title": "[ZH] 도메인 재구성: leedohyun.com(개인) / posselect.com(쇼핑몰) 분리 (2026-08-02)",
-      "summary": "[ZH] leedohyun.com(개인)과 posselect.com(쇼핑몰) 도메인 분리 완료. K3s 인프라는 공유하되, 인증/라우팅/DNS 계층은 독립적으로 운영.",
+      "title": "域名重构：leedohyun.com（个人）/ posselect.com（商城）分离 (2026-08-02)",
+      "summary": "已完成leedohyun.com（个人）和posselect.com（商城）的域名分离。K3s基础设施共享，但认证/路由/DNS层独立运营。",
       "leedohyun_com": [
-        "[ZH] leedohyun.com/www → blog.leedohyun.com 리다이렉트",
+        "leedohyun.com/www → 重定向至 blog.leedohyun.com",
         "blog/wordpress",
         "alm/redmine",
         "minio/static",
@@ -317,7 +317,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "[ZH] posselect.com/www → home.posselect.com 리다이렉트",
+        "posselect.com/www → 重定向至 home.posselect.com",
         "home",
         "customer",
         "product",
@@ -325,122 +325,122 @@
         "keycloak"
       ],
       "migrated_items": [
-        "[ZH] Route53: posselect.com 신규 호스팅 영역 및 레코드 분리",
-        "[ZH] TLS: posselect.com 전용 와일드카드 인증서 분리",
-        "[ZH] Ingress: 도메인별 라우팅 진입점 분리",
-        "[ZH] 게이트웨이: 보안 설정 외부화를 통한 도메인 독립성 확보",
-        "[ZH] Keycloak: 쇼핑몰 전용 인증 서버 분리",
-        "[ZH] 메일: 쇼핑몰 전용 메일 서버 계정 구축"
+        "Route53：posselect.com的新托管区域及记录分离",
+        "TLS：posselect.com专用的通配符证书分离",
+        "Ingress：按域名分离的路由入口点",
+        "网关：通过外部化安全设置确保域名独立性",
+        "Keycloak：商城专用认证服务器分离",
+        "邮件：搭建商城专用的邮件服务器账户"
       ],
-      "backward_compat": "[ZH] 기존 leedohyun.com 기반 호스트는 posselect.com으로 302 리다이렉트 처리하여 호환성 유지."
+      "backward_compat": "传统的基于leedohyun.com的主机已被重定向至posselect.com，以保持兼容性。"
     },
     "resources": {
-      "cpu": "[ZH] ~5% (단일 6코어 Ryzen 5 1600 기준)",
-      "memory": "[ZH] ~19% (62Gi DDR4 듀얼채널 기준)",
+      "cpu": "~5% (基于单路6核 Ryzen 5 1600)",
+      "memory": "~19% (基于62Gi DDR4 双通道)",
       "nodes": 1,
-      "cluster_type": "[ZH] K3s v1.33 (단일 노드, control-plane 겸 worker)"
+      "cluster_type": "K3s v1.33 (单节点，control-plane兼worker)"
     },
     "updated_at": "2026-08-15",
     "improved": [
       {
-        "name": "[ZH] Spring Cloud Gateway 단일 진입점",
+        "name": "Spring Cloud Gateway 单一入口点",
         "domains": [
-          "[ZH] 게이트웨이 기반 트래픽 라우팅 처리 완료"
+          "基于网关的流量路由处理已完成"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨"
+        "status_text": "已完成"
       },
       {
         "name": "Prometheus / Grafana",
         "domains": [
-          "[ZH] 운영 서비스 및 DB 메트릭 연결 완료"
+          "生产服务及数据库指标连接已完成"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨"
+        "status_text": "已完成"
       },
       {
-        "name": "[ZH] Loki / Promtail (로그 수집)",
+        "name": "Loki / Promtail (日志收集)",
         "domains": [
-          "[ZH] 전역 로그 수집 및 14일 보관"
+          "全局日志收集及14天保留"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨"
+        "status_text": "已完成"
       },
       {
-        "name": "[ZH] Alertmanager 외부 알림",
+        "name": "Alertmanager 外部警报",
         "domains": [
-          "[ZH] Email 알림 채널 연동 완료. 추가 채널 추후 계획"
+          "Email通知频道集成已完成。计划后续增加其他频道"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨(Email)"
+        "status_text": "已完成(Email)"
       },
       {
-        "name": "[ZH] Jaeger (분산 트레이싱)",
+        "name": "Jaeger (分布式追踪)",
         "domains": [
-          "[ZH] Java 백엔드 4개 자동 계측 완료"
+          "4个Java后端自动测量已完成"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨"
+        "status_text": "已完成"
       },
       {
-        "name": "[ZH] Velero (백업 자동화)",
+        "name": "Velero (备份自动化)",
         "domains": [
-          "[ZH] 전 네임스페이스 매일 백업 구성 완료"
+          "所有命名空间每日自动备份配置完成"
         ],
         "status": "deployed",
-        "status_text": "[ZH] 완료됨"
+        "status_text": "已完成"
       },
       {
         "name": "Kiali",
         "domains": [
-          "[ZH] 서비스 메시 관찰성 — Istio 의존이라 보류"
+          "服务网格可观测性 — 因依赖Istio而搁置"
         ],
         "status": "planned",
-        "status_text": "[ZH] 계획됨"
+        "status_text": "计划中"
       }
     ],
     "roadmap": {
-      "desc": "[ZH] 현재 K3s 단일 노드 시스템은 과도기적 인프라입니다. 향후 쇼핑몰 서비스의 트래픽 성장에 따라 VOD, 라이브 스트리밍 등의 도입과 함께 매니지드 클라우드 인프라로의 대규모 확장을 계획하고 있습니다.",
+      "desc": "当前的K3s单节点系统是过渡期的基础设施。未来，随着商城服务流量的增长，计划引入VOD、直播等功能，并大规模扩展到托管云基础设施。",
       "items": [
         {
-          "name": "[ZH] URL 경로 설계의 인프라 독립성 확보",
+          "name": "URL路径设计的基础设施独立性保障",
           "domains": [
-            "[ZH] S3 마이그레이션을 고려한 MinIO 버킷 및 경로 독립적 설계"
+            "考虑S3迁移的MinIO存储桶和路径的独立设计"
           ],
           "status": "deployed",
-          "status_text": "[ZH] 원칙 확정"
+          "status_text": "原则已确认"
         },
         {
-          "name": "[ZH] CDN 버킷 명명 규칙 수립",
+          "name": "制定CDN存储桶命名规则",
           "domains": [
-            "[ZH] 콘텐츠 타입 기반(shop/static, shop/image)의 버킷 구성 원칙"
+            "基于内容类型(shop/static, shop/image)的存储桶配置原则"
           ],
           "status": "deployed",
-          "status_text": "[ZH] 확정"
+          "status_text": "已确认"
         },
         {
-          "name": "[ZH] VOD (주문형 비디오)",
+          "name": "VOD (视频点播)",
           "domains": [
-            "[ZH] CPU 집약적 트랜스코딩을 위한 매니지드 VOD 서비스 도입 예정"
+            "计划引入托管VOD服务以进行CPU密集型转码"
           ],
           "status": "planned",
-          "status_text": "[ZH] 계획됨"
+          "status_text": "计划中"
         },
         {
-          "name": "[ZH] 실시간 라이브 스트리밍",
+          "name": "实时直播",
           "domains": [
-            "[ZH] AWS IVS 등 매니지드 서비스 기반 라이브 스트리밍 기능 확장"
+            "扩展基于AWS IVS等托管服务的直播功能"
           ],
           "status": "planned",
-          "status_text": "[ZH] 계획됨"
+          "status_text": "计划中"
         },
         {
-          "name": "[ZH] 서브도메인 → 단일 CDN 도메인 통합",
+          "name": "子域名 → 单一CDN域名整合",
           "domains": [
-            "[ZH] 추후 단일 CDN 도메인 + Path 기반 구조로 통합 검토"
+            "考虑未来整合为单一CDN域名 + 基于Path的结构"
           ],
           "status": "planned",
-          "status_text": "[ZH] 검토 대상"
+          "status_text": "审查中"
         }
       ]
     }

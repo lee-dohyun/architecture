@@ -29,13 +29,13 @@
   },
   "data": {
     "current": {
-      "title": "[JA] 현재 K3s 클러스터 아키텍처 구조도 (실제 배포 상태)",
+      "title": "現在のK3sクラスターアーキテクチャ図（実際のデプロイ状況）",
       "services": {
         "gateway": [
           {
             "name": "Spring Cloud Gateway",
             "domains": [
-              "[JA] *.leedohyun.com 전체 + *.posselect.com 전체의 실제 진입점 (단일 게이트웨이 공유)"
+              "すべての*.leedohyun.com + すべての*.posselect.comの実際のエントリポイント（単一ゲートウェイ共有）"
             ],
             "status": "deployed"
           }
@@ -63,7 +63,7 @@
               "minio.leedohyun.com",
               "static.leedohyun.com"
             ],
-            "desc": "[JA] S3 호환 오브젝트 스토리지. 개인용 및 쇼핑몰 공용 인스턴스.",
+            "desc": "S3互換のオブジェクトストレージ。個人用およびショッピングモール共用インスタンス。",
             "status": "deployed"
           },
           {
@@ -82,7 +82,7 @@
             "status": "deployed"
           },
           {
-            "name": "[JA] 라우터 관리화면 프록시",
+            "name": "ルーター管理画面プロキシ",
             "domains": [
               "router.leedohyun.com"
             ],
@@ -95,7 +95,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "[JA] 쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료.",
+            "desc": "ショッピングモールのメインランディングページ（Next.js）。メインページの領域別商品情報およびバナーAPI連動完了。",
             "status": "deployed"
           },
           {
@@ -103,7 +103,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "[JA] 로그인/회원가입/정보수정 기능. 이용약관 및 개인정보방침 백엔드 저장 처리.",
+            "desc": "ログイン/会員登録/情報修正機能。利用規約およびプライバシーポリシーのバックエンド保存処理完了。",
             "status": "deployed"
           },
           {
@@ -111,7 +111,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "[JA] 상품 목록 및 장바구니. 상품 정보 API 캐싱 적용 완료.",
+            "desc": "商品一覧およびカート。商品情報APIキャッシング適用完了。",
             "status": "deployed"
           },
           {
@@ -119,7 +119,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "[JA] 주문/결제 처리(Mock). 계정 자동 연결.",
+            "desc": "注文/決済処理（Mock）。アカウント自動連携。",
             "status": "deployed"
           },
           {
@@ -127,7 +127,7 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "[JA] 관리자 백오피스. Keycloak(staff realm) 로그인.",
+            "desc": "管理者バックオフィス。Keycloak（staffレルム）ログイン。",
             "status": "deployed"
           },
           {
@@ -135,33 +135,33 @@
             "domains": [
               "keycloak.posselect.com"
             ],
-            "desc": "[JA] 쇼핑몰 전용 SSO/OAuth2·OIDC 인증 서버.",
+            "desc": "ショッピングモール専用SSO/OAuth2・OIDC認証サーバー。",
             "status": "deployed"
           },
           {
-            "name": "[JA] Grafana (모니터링)",
+            "name": "Grafana (監視)",
             "domains": [
               "monitoring.posselect.com"
             ],
-            "desc": "[JA] 쇼핑몰 전용 모니터링. 게이트웨이 및 API 메트릭 스크레이핑.",
+            "desc": "ショッピングモール専用監視。ゲートウェイおよびAPIメトリクススクレイピング。",
             "status": "deployed"
           },
           {
             "name": "imgproxy CDN",
             "domains": [
-              "[JA] image.posselect.com (imgproxy 리사이징)",
-              "[JA] static.posselect.com (MinIO 직접 서빙)"
+              "image.posselect.com (imgproxy リサイズ)",
+              "static.posselect.com (MinIO 直接配信)"
             ],
-            "desc": "[JA] 이미지 동적 리사이징 서버. MinIO 기반 서명 URL 제공.",
+            "desc": "動的画像リサイズサーバー。MinIOベースの署名付きURLを提供。",
             "status": "deployed"
           },
           {
             "name": "posselect-ui",
             "domains": [
               "storybook.posselect.com",
-              "[JA] ui.posselect.com (별칭)"
+              "ui.posselect.com (エイリアス)"
             ],
-            "desc": "[JA] 디자인 시스템 레퍼런스 페이지. 반응형·다국어 컴포넌트, 접근성 검사 등 Storybook 환경 개선 완료.",
+            "desc": "デザインシステムのリファレンスページ。レスポンシブ・多言語コンポーネント、アクセシビリティ検査などのStorybook環境の改善完了。",
             "status": "deployed"
           },
           {
@@ -169,18 +169,18 @@
             "domains": [
               "shell.posselect.com"
             ],
-            "desc": "[JA] 공통 헤더/푸터 및 카테고리 런타임 셸 (정적 서빙).",
+            "desc": "共通ヘッダー/フッターおよびカテゴリのランタイムシェル（静的配信）。",
             "status": "deployed"
           }
         ],
         "mail": [
           {
-            "name": "[JA] 자체 메일서버 (docker-mailserver)",
+            "name": "自前メールサーバー (docker-mailserver)",
             "domains": [
               "customer-service@leedohyun.com",
               "customer-service@posselect.com"
             ],
-            "desc": "[JA] 인증메일/주문알림 발신, 두 도메인 모두 DKIM 서명",
+            "desc": "認証メール/注文通知の送信、両ドメインともDKIM署名済み",
             "status": "deployed"
           }
         ],
@@ -211,7 +211,7 @@
           {
             "name": "PostgreSQL (postgres-service, customer ns)",
             "services": [
-              "[JA] 레거시, 인증 목적 미사용"
+              "レガシー、認証目的では未使用"
             ],
             "status": "deployed"
           }
@@ -227,7 +227,7 @@
           {
             "name": "Redis (customer ns)",
             "services": [
-              "[JA] product-api 장바구니"
+              "product-api カート"
             ],
             "status": "deployed"
           }
@@ -238,7 +238,7 @@
             "status": "deployed"
           },
           {
-            "name": "[JA] cert-manager (와일드카드 *.leedohyun.com + *.posselect.com, 2개 도메인 각각 별도 Certificate)",
+            "name": "cert-manager (ワイルドカード *.leedohyun.com + *.posselect.com、2つのドメインそれぞれに個別の証明書)",
             "status": "deployed"
           },
           {
@@ -255,59 +255,59 @@
           },
           {
             "name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)",
-            "desc": "[JA] Prometheus/Grafana/Alertmanager 모니터링 스택. Email 알림 연동.",
+            "desc": "Prometheus/Grafana/Alertmanager監視スタック。Email通知連携。",
             "status": "deployed"
           },
           {
             "name": "Loki / Promtail",
-            "desc": "[JA] 전 네임스페이스 컨테이너 로그 수집.",
+            "desc": "全ネームスペースのコンテナログ収集。",
             "status": "deployed"
           },
           {
-            "name": "[JA] Jaeger (분산 트레이싱)",
-            "desc": "[JA] Java 백엔드 분산 트레이싱 (OTel).",
+            "name": "Jaeger (分散トレーシング)",
+            "desc": "Javaバックエンドの分散トレーシング（OTel）。",
             "status": "deployed"
           },
           {
-            "name": "[JA] Velero (백업 자동화)",
-            "desc": "[JA] MinIO 기반 PVC 데이터 일일 백업 자동화.",
+            "name": "Velero (バックアップ自動化)",
+            "desc": "MinIOベースのPVCデータの毎日自動バックアップ。",
             "status": "deployed"
           }
         ],
         "cicd": [
           {
-            "name": "[JA] GitHub Actions CI (이미지 빌드+푸시)",
-            "scope": "[JA] 전 저장소",
+            "name": "GitHub Actions CI (イメージビルド+プッシュ)",
+            "scope": "全リポジトリ",
             "status": "deployed"
           },
           {
-            "name": "[JA] self-hosted runner 기반 CD (자동 배포)",
+            "name": "self-hosted runner CD (自動デプロイ)",
             "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
             "status": "deployed"
           },
           {
-            "name": "[JA] 수동 배포",
-            "scope": "[JA] architecture-web, wordpress, tool 등",
+            "name": "手動デプロイ",
+            "scope": "architecture-web、wordpress、toolなど",
             "status": "manual"
           }
         ]
       },
       "issues": [
-        "[JA] 보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)",
-        "[JA] 분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
-        "[JA] 단일 장애점 (단일 노드 클러스터, 이중화 없음)",
-        "[JA] Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",
-        "[JA] 자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음 (구조적 한계)",
-        "[JA] architecture-web/tool/wordpress는 여전히 수동 배포",
-        "[JA] customer.front 간편 로그인(카카오/네이버/구글) 구현 및 휴대폰 본인인증 백엔드 연동 필요",
-        "[JA] Velero 주기적(3개월 등) 복구 재검증 루틴 필요"
+        "セキュリティ強化未適用（RBACの細分化、NetworkPolicy、Istio mTLS — 計画書のみ存在）",
+        "分散トレーシングはJavaバックエンド4つのみ計測（Next.jsフロントエンドは未計測）、Kiali/サービスメッシュの可観測性は依然としてなし",
+        "単一障害点（単一ノードクラスター、冗長化なし）",
+        "AlertmanagerはEmailのみ連携、Slackなどの追加チャンネルは未連携",
+        "自前メールサーバーが家庭用動的IP+PTR未設定のため、スパムフォルダに到達する可能性あり（構造的限界）",
+        "architecture-web/tool/wordpressは依然として手動デプロイ",
+        "customer.frontのソーシャルログイン（Kakao/Naver/Google）実装および携帯電話の本人認証バックエンド連携が必要",
+        "Veleroの定期的（3ヶ月など）な復元再検証ルーチンが必要"
       ]
     },
     "domain_split": {
-      "title": "[JA] 도메인 재구성: leedohyun.com(개인) / posselect.com(쇼핑몰) 분리 (2026-08-02)",
-      "summary": "[JA] leedohyun.com(개인)과 posselect.com(쇼핑몰) 도메인 분리 완료. K3s 인프라는 공유하되, 인증/라우팅/DNS 계층은 독립적으로 운영.",
+      "title": "ドメイン再構成：leedohyun.com（個人）/ posselect.com（ショップ）分離 (2026-08-02)",
+      "summary": "leedohyun.com（個人）とposselect.com（ショッピングモール）のドメイン分離完了。K3sインフラは共有しつつ、認証/ルーティング/DNSレイヤーは独立して運営。",
       "leedohyun_com": [
-        "[JA] leedohyun.com/www → blog.leedohyun.com 리다이렉트",
+        "leedohyun.com/www → blog.leedohyun.com にリダイレクト",
         "blog/wordpress",
         "alm/redmine",
         "minio/static",
@@ -317,7 +317,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "[JA] posselect.com/www → home.posselect.com 리다이렉트",
+        "posselect.com/www → home.posselect.com にリダイレクト",
         "home",
         "customer",
         "product",
@@ -325,122 +325,122 @@
         "keycloak"
       ],
       "migrated_items": [
-        "[JA] Route53: posselect.com 신규 호스팅 영역 및 레코드 분리",
-        "[JA] TLS: posselect.com 전용 와일드카드 인증서 분리",
-        "[JA] Ingress: 도메인별 라우팅 진입점 분리",
-        "[JA] 게이트웨이: 보안 설정 외부화를 통한 도메인 독립성 확보",
-        "[JA] Keycloak: 쇼핑몰 전용 인증 서버 분리",
-        "[JA] 메일: 쇼핑몰 전용 메일 서버 계정 구축"
+        "Route53: posselect.comの新規ホストゾーンおよびレコードの分離",
+        "TLS: posselect.com専用のワイルドカード証明書の分離",
+        "Ingress: ドメイン別のルーティングエントリポイントの分離",
+        "ゲートウェイ: セキュリティ設定の外部化によるドメイン独立性の確保",
+        "Keycloak: ショッピングモール専用認証サーバーの分離",
+        "メール: ショッピングモール専用メールサーバーアカウントの構築"
       ],
-      "backward_compat": "[JA] 기존 leedohyun.com 기반 호스트는 posselect.com으로 302 리다이렉트 처리하여 호환성 유지."
+      "backward_compat": "従来のleedohyun.comベースのホストはposselect.comへ302リダイレクト処理して互換性を維持。"
     },
     "resources": {
-      "cpu": "[JA] ~5% (단일 6코어 Ryzen 5 1600 기준)",
-      "memory": "[JA] ~19% (62Gi DDR4 듀얼채널 기준)",
+      "cpu": "~5% (単一6コア Ryzen 5 1600 基準)",
+      "memory": "~19% (62Gi DDR4 デュアルチャネル 基準)",
       "nodes": 1,
-      "cluster_type": "[JA] K3s v1.33 (단일 노드, control-plane 겸 worker)"
+      "cluster_type": "K3s v1.33 (単一ノード、control-plane兼worker)"
     },
     "updated_at": "2026-08-15",
     "improved": [
       {
-        "name": "[JA] Spring Cloud Gateway 단일 진입점",
+        "name": "Spring Cloud Gateway 単一エントリポイント",
         "domains": [
-          "[JA] 게이트웨이 기반 트래픽 라우팅 처리 완료"
+          "ゲートウェイベースのトラフィックルーティング処理完了"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨"
+        "status_text": "完了"
       },
       {
         "name": "Prometheus / Grafana",
         "domains": [
-          "[JA] 운영 서비스 및 DB 메트릭 연결 완료"
+          "本番サービスおよびDBメトリクスの接続完了"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨"
+        "status_text": "完了"
       },
       {
-        "name": "[JA] Loki / Promtail (로그 수집)",
+        "name": "Loki / Promtail (ログ収集)",
         "domains": [
-          "[JA] 전역 로그 수집 및 14일 보관"
+          "グローバルログの収集および14日間の保存"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨"
+        "status_text": "完了"
       },
       {
-        "name": "[JA] Alertmanager 외부 알림",
+        "name": "Alertmanager 外部通知",
         "domains": [
-          "[JA] Email 알림 채널 연동 완료. 추가 채널 추후 계획"
+          "Email通知チャンネルの連携完了。追加チャンネルは今後計画"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨(Email)"
+        "status_text": "完了(Email)"
       },
       {
-        "name": "[JA] Jaeger (분산 트레이싱)",
+        "name": "Jaeger (分散トレーシング)",
         "domains": [
-          "[JA] Java 백엔드 4개 자동 계측 완료"
+          "Javaバックエンド4つの自動計測完了"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨"
+        "status_text": "完了"
       },
       {
-        "name": "[JA] Velero (백업 자동화)",
+        "name": "Velero (バックアップ自動化)",
         "domains": [
-          "[JA] 전 네임스페이스 매일 백업 구성 완료"
+          "全ネームスペースの毎日バックアップ構成完了"
         ],
         "status": "deployed",
-        "status_text": "[JA] 완료됨"
+        "status_text": "完了"
       },
       {
         "name": "Kiali",
         "domains": [
-          "[JA] 서비스 메시 관찰성 — Istio 의존이라 보류"
+          "サービスメッシュの可観測性 — Istio依存のため保留"
         ],
         "status": "planned",
-        "status_text": "[JA] 계획됨"
+        "status_text": "計画中"
       }
     ],
     "roadmap": {
-      "desc": "[JA] 현재 K3s 단일 노드 시스템은 과도기적 인프라입니다. 향후 쇼핑몰 서비스의 트래픽 성장에 따라 VOD, 라이브 스트리밍 등의 도입과 함께 매니지드 클라우드 인프라로의 대규모 확장을 계획하고 있습니다.",
+      "desc": "現在のK3s単一ノードシステムは過渡期的なインフラです。今後、ショッピングモールサービスのトラフィック増加に伴い、VODやライブストリーミングの導入とともに、マネージドクラウドインフラへの大規模な拡張を計画しています。",
       "items": [
         {
-          "name": "[JA] URL 경로 설계의 인프라 독립성 확보",
+          "name": "URLパス設計のインフラ独立性の確保",
           "domains": [
-            "[JA] S3 마이그레이션을 고려한 MinIO 버킷 및 경로 독립적 설계"
+            "S3移行を考慮したMinIOバケットおよびパスの独立した設計"
           ],
           "status": "deployed",
-          "status_text": "[JA] 원칙 확정"
+          "status_text": "原則確定"
         },
         {
-          "name": "[JA] CDN 버킷 명명 규칙 수립",
+          "name": "CDNバケットの命名規則の確立",
           "domains": [
-            "[JA] 콘텐츠 타입 기반(shop/static, shop/image)의 버킷 구성 원칙"
+            "コンテンツタイプ（shop/static, shop/image）ベースのバケット構成原則"
           ],
           "status": "deployed",
-          "status_text": "[JA] 확정"
+          "status_text": "確定"
         },
         {
-          "name": "[JA] VOD (주문형 비디오)",
+          "name": "VOD (ビデオオンデマンド)",
           "domains": [
-            "[JA] CPU 집약적 트랜스코딩을 위한 매니지드 VOD 서비스 도입 예정"
+            "CPU集約的なトランスコーディングのためのマネージドVODサービスの導入予定"
           ],
           "status": "planned",
-          "status_text": "[JA] 계획됨"
+          "status_text": "計画中"
         },
         {
-          "name": "[JA] 실시간 라이브 스트리밍",
+          "name": "リアルタイムライブストリーミング",
           "domains": [
-            "[JA] AWS IVS 등 매니지드 서비스 기반 라이브 스트리밍 기능 확장"
+            "AWS IVSなどのマネージドサービスベースのライブストリーミング機能の拡張"
           ],
           "status": "planned",
-          "status_text": "[JA] 계획됨"
+          "status_text": "計画中"
         },
         {
-          "name": "[JA] 서브도메인 → 단일 CDN 도메인 통합",
+          "name": "サブドメイン → 単一CDNドメインの統合",
           "domains": [
-            "[JA] 추후 단일 CDN 도메인 + Path 기반 구조로 통합 검토"
+            "今後、単一CDNドメイン + パスベースの構造への統合を検討"
           ],
           "status": "planned",
-          "status_text": "[JA] 검토 대상"
+          "status_text": "検討対象"
         }
       ]
     }

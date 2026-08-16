@@ -1,0 +1,418 @@
+{
+  "current": {
+    "title": "当前K3s集群架构图（实际部署状态）",
+    "services": {
+      "gateway": [
+        {
+          "name": "Spring Cloud Gateway",
+          "domains": [
+            "所有 *.leedohyun.com + 所有 *.posselect.com 的实际入口点（共享单个网关）"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "personal_line": [
+        {
+          "name": "WordPress",
+          "domains": [
+            "leedohyun.com",
+            "blog.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Redmine",
+          "domains": [
+            "alm.leedohyun.com",
+            "redmine.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "MinIO",
+          "domains": [
+            "minio.leedohyun.com",
+            "static.leedohyun.com"
+          ],
+          "desc": "兼容S3的对象存储。个人和商城共用实例。",
+          "status": "deployed"
+        },
+        {
+          "name": "Tool",
+          "domains": [
+            "tool.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Architecture Web",
+          "domains": [
+            "architecture.leedohyun.com",
+            "architecture.posselect.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "路由器管理界面代理",
+          "domains": [
+            "router.leedohyun.com"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "shop_line": [
+        {
+          "name": "store.front",
+          "domains": [
+            "home.posselect.com"
+          ],
+          "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。",
+          "status": "deployed"
+        },
+        {
+          "name": "customer.front / auth.api",
+          "domains": [
+            "customer.posselect.com"
+          ],
+          "desc": "登录/注册/修改信息功能。服务条款和隐私政策后端保存处理完毕。",
+          "status": "deployed"
+        },
+        {
+          "name": "product.front / product-api",
+          "domains": [
+            "product.posselect.com"
+          ],
+          "desc": "商品列表和购物车。商品信息API缓存应用完成。",
+          "status": "deployed"
+        },
+        {
+          "name": "order-api",
+          "domains": [
+            "/api/orders/** (customer.posselect.com, product.posselect.com)"
+          ],
+          "desc": "订单/支付处理（Mock）。自动关联账户。",
+          "status": "deployed"
+        },
+        {
+          "name": "admin.front",
+          "domains": [
+            "admin.posselect.com"
+          ],
+          "desc": "管理员后台。Keycloak（staff领域）登录。",
+          "status": "deployed"
+        },
+        {
+          "name": "Keycloak",
+          "domains": [
+            "keycloak.posselect.com"
+          ],
+          "desc": "商城专用SSO/OAuth2·OIDC认证服务器。",
+          "status": "deployed"
+        },
+        {
+          "name": "Grafana (监控)",
+          "domains": [
+            "monitoring.posselect.com"
+          ],
+          "desc": "商城专用监控。网关及API指标抓取。",
+          "status": "deployed"
+        },
+        {
+          "name": "imgproxy CDN",
+          "domains": [
+            "image.posselect.com (imgproxy 调整大小)",
+            "static.posselect.com (MinIO 直接提供)"
+          ],
+          "desc": "动态图像调整大小服务器。提供基于MinIO的签名URL。",
+          "status": "deployed"
+        },
+        {
+          "name": "posselect-ui",
+          "domains": [
+            "storybook.posselect.com",
+            "ui.posselect.com (别名)"
+          ],
+          "desc": "设计系统参考页面。完成Storybook环境改进，如响应式/多语言组件、可访问性检查等。",
+          "status": "deployed"
+        },
+        {
+          "name": "posselect-shell",
+          "domains": [
+            "shell.posselect.com"
+          ],
+          "desc": "公共页眉/页脚和分类抽屉的运行时Shell（静态服务）。",
+          "status": "deployed"
+        }
+      ],
+      "mail": [
+        {
+          "name": "自建邮件服务器 (docker-mailserver)",
+          "domains": [
+            "customer-service@leedohyun.com",
+            "customer-service@posselect.com"
+          ],
+          "desc": "发送验证邮件/订单通知，两个域名均已配置DKIM签名",
+          "status": "deployed"
+        }
+      ],
+      "databases": [
+        {
+          "name": "MySQL",
+          "services": [
+            "WordPress",
+            "Redmine"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (keycloak)",
+          "services": [
+            "Keycloak"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (catalog-postgres, orders-postgres)",
+          "services": [
+            "product-api",
+            "order-api"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (postgres-service, customer ns)",
+          "services": [
+            "遗留，不用于身份验证"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "cache": [
+        {
+          "name": "Redis (default ns)",
+          "services": [
+            "WordPress"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Redis (customer ns)",
+          "services": [
+            "product-api 购物车"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "infrastructure": [
+        {
+          "name": "Traefik Ingress (kube-system)",
+          "status": "deployed"
+        },
+        {
+          "name": "cert-manager (通配符 *.leedohyun.com + *.posselect.com，两个域名分别有独立的证书)",
+          "status": "deployed"
+        },
+        {
+          "name": "MetalLB",
+          "status": "deployed"
+        },
+        {
+          "name": "coredns",
+          "status": "deployed"
+        },
+        {
+          "name": "metrics-server",
+          "status": "deployed"
+        },
+        {
+          "name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)",
+          "desc": "Prometheus/Grafana/Alertmanager 监控栈。Email警报集成。",
+          "status": "deployed"
+        },
+        {
+          "name": "Loki / Promtail",
+          "desc": "所有命名空间的全局容器日志收集。",
+          "status": "deployed"
+        },
+        {
+          "name": "Jaeger (分布式追踪)",
+          "desc": "Java后端分布式追踪（OTel）。",
+          "status": "deployed"
+        },
+        {
+          "name": "Velero (备份自动化)",
+          "desc": "基于MinIO的PVC数据每日自动备份。",
+          "status": "deployed"
+        }
+      ],
+      "cicd": [
+        {
+          "name": "GitHub Actions CI (镜像构建+推送)",
+          "scope": "所有仓库",
+          "status": "deployed"
+        },
+        {
+          "name": "基于self-hosted runner的CD (自动部署)",
+          "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
+          "status": "deployed"
+        },
+        {
+          "name": "手动部署",
+          "scope": "architecture-web, wordpress, tool等",
+          "status": "manual"
+        }
+      ]
+    },
+    "issues": [
+      "未应用安全加固（RBAC细分、NetworkPolicy、Istio mTLS — 仅存在计划文档）",
+      "分布式追踪仅测量了4个Java后端（Next.js前端未测量），Kiali/服务网格可观测性仍然缺失",
+      "单点故障（单节点集群，无冗余）",
+      "Alertmanager仅集成了Email，Slack等额外频道尚未集成",
+      "自建邮件服务器因家庭动态IP+无PTR设置，存在进入垃圾邮件箱的可能性（结构性限制）",
+      "architecture-web/tool/wordpress仍然手动部署",
+      "customer.front需要实现社交登录（Kakao/Naver/Google）及手机身份验证后端对接",
+      "Velero需要定期（如3个月）的恢复重新验证例程"
+    ]
+  },
+  "domain_split": {
+    "title": "域名重构：leedohyun.com（个人）/ posselect.com（商城）分离 (2026-08-02)",
+    "summary": "已完成leedohyun.com（个人）和posselect.com（商城）的域名分离。K3s基础设施共享，但认证/路由/DNS层独立运营。",
+    "leedohyun_com": [
+      "leedohyun.com/www → 重定向至 blog.leedohyun.com",
+      "blog/wordpress",
+      "alm/redmine",
+      "minio/static",
+      "tool",
+      "architecture",
+      "router",
+      "monitoring"
+    ],
+    "posselect_com": [
+      "posselect.com/www → 重定向至 home.posselect.com",
+      "home",
+      "customer",
+      "product",
+      "admin",
+      "keycloak"
+    ],
+    "migrated_items": [
+      "Route53：posselect.com的新托管区域及记录分离",
+      "TLS：posselect.com专用的通配符证书分离",
+      "Ingress：按域名分离的路由入口点",
+      "网关：通过外部化安全设置确保域名独立性",
+      "Keycloak：商城专用认证服务器分离",
+      "邮件：搭建商城专用的邮件服务器账户"
+    ],
+    "backward_compat": "传统的基于leedohyun.com的主机已被重定向至posselect.com，以保持兼容性。"
+  },
+  "resources": {
+    "cpu": "~5% (基于单路6核 Ryzen 5 1600)",
+    "memory": "~19% (基于62Gi DDR4 双通道)",
+    "nodes": 1,
+    "cluster_type": "K3s v1.33 (单节点，control-plane兼worker)"
+  },
+  "updated_at": "2026-08-15",
+  "improved": [
+    {
+      "name": "Spring Cloud Gateway 单一入口点",
+      "domains": [
+        "基于网关的流量路由处理已完成"
+      ],
+      "status": "deployed",
+      "status_text": "已完成"
+    },
+    {
+      "name": "Prometheus / Grafana",
+      "domains": [
+        "生产服务及数据库指标连接已完成"
+      ],
+      "status": "deployed",
+      "status_text": "已完成"
+    },
+    {
+      "name": "Loki / Promtail (日志收集)",
+      "domains": [
+        "全局日志收集及14天保留"
+      ],
+      "status": "deployed",
+      "status_text": "已完成"
+    },
+    {
+      "name": "Alertmanager 外部警报",
+      "domains": [
+        "Email通知频道集成已完成。计划后续增加其他频道"
+      ],
+      "status": "deployed",
+      "status_text": "已完成(Email)"
+    },
+    {
+      "name": "Jaeger (分布式追踪)",
+      "domains": [
+        "4个Java后端自动测量已完成"
+      ],
+      "status": "deployed",
+      "status_text": "已完成"
+    },
+    {
+      "name": "Velero (备份自动化)",
+      "domains": [
+        "所有命名空间每日自动备份配置完成"
+      ],
+      "status": "deployed",
+      "status_text": "已完成"
+    },
+    {
+      "name": "Kiali",
+      "domains": [
+        "服务网格可观测性 — 因依赖Istio而搁置"
+      ],
+      "status": "planned",
+      "status_text": "计划中"
+    }
+  ],
+  "roadmap": {
+    "desc": "当前的K3s单节点系统是过渡期的基础设施。未来，随着商城服务流量的增长，计划引入VOD、直播等功能，并大规模扩展到托管云基础设施。",
+    "items": [
+      {
+        "name": "URL路径设计的基础设施独立性保障",
+        "domains": [
+          "考虑S3迁移的MinIO存储桶和路径的独立设计"
+        ],
+        "status": "deployed",
+        "status_text": "原则已确认"
+      },
+      {
+        "name": "制定CDN存储桶命名规则",
+        "domains": [
+          "基于内容类型(shop/static, shop/image)的存储桶配置原则"
+        ],
+        "status": "deployed",
+        "status_text": "已确认"
+      },
+      {
+        "name": "VOD (视频点播)",
+        "domains": [
+          "计划引入托管VOD服务以进行CPU密集型转码"
+        ],
+        "status": "planned",
+        "status_text": "计划中"
+      },
+      {
+        "name": "实时直播",
+        "domains": [
+          "扩展基于AWS IVS等托管服务的直播功能"
+        ],
+        "status": "planned",
+        "status_text": "计划中"
+      },
+      {
+        "name": "子域名 → 单一CDN域名整合",
+        "domains": [
+          "考虑未来整合为单一CDN域名 + 基于Path的结构"
+        ],
+        "status": "planned",
+        "status_text": "审查中"
+      }
+    ]
+  }
+}

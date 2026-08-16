@@ -1,0 +1,418 @@
+{
+  "current": {
+    "title": "Current K3s Cluster Architecture (Deployed Status)",
+    "services": {
+      "gateway": [
+        {
+          "name": "Spring Cloud Gateway",
+          "domains": [
+            "Actual entry point for all *.leedohyun.com + all *.posselect.com (Shared single gateway)"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "personal_line": [
+        {
+          "name": "WordPress",
+          "domains": [
+            "leedohyun.com",
+            "blog.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Redmine",
+          "domains": [
+            "alm.leedohyun.com",
+            "redmine.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "MinIO",
+          "domains": [
+            "minio.leedohyun.com",
+            "static.leedohyun.com"
+          ],
+          "desc": "S3-compatible object storage. Shared instance for personal and shopping mall use.",
+          "status": "deployed"
+        },
+        {
+          "name": "Tool",
+          "domains": [
+            "tool.leedohyun.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Architecture Web",
+          "domains": [
+            "architecture.leedohyun.com",
+            "architecture.posselect.com"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Router Admin Proxy",
+          "domains": [
+            "router.leedohyun.com"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "shop_line": [
+        {
+          "name": "store.front",
+          "domains": [
+            "home.posselect.com"
+          ],
+          "desc": "Shopping mall main landing page (Next.js). Product info and banner API integration completed for main page sections.",
+          "status": "deployed"
+        },
+        {
+          "name": "customer.front / auth.api",
+          "domains": [
+            "customer.posselect.com"
+          ],
+          "desc": "Login/Signup/Profile editing features. Backend integration completed for terms of service and privacy policy.",
+          "status": "deployed"
+        },
+        {
+          "name": "product.front / product-api",
+          "domains": [
+            "product.posselect.com"
+          ],
+          "desc": "Product list and cart. Product info API caching applied.",
+          "status": "deployed"
+        },
+        {
+          "name": "order-api",
+          "domains": [
+            "/api/orders/** (customer.posselect.com, product.posselect.com)"
+          ],
+          "desc": "Order/Payment processing (Mock). Automatic account linking.",
+          "status": "deployed"
+        },
+        {
+          "name": "admin.front",
+          "domains": [
+            "admin.posselect.com"
+          ],
+          "desc": "Admin backoffice. Keycloak (staff realm) login.",
+          "status": "deployed"
+        },
+        {
+          "name": "Keycloak",
+          "domains": [
+            "keycloak.posselect.com"
+          ],
+          "desc": "SSO/OAuth2·OIDC authentication server dedicated for the shopping mall.",
+          "status": "deployed"
+        },
+        {
+          "name": "Grafana (Monitoring)",
+          "domains": [
+            "monitoring.posselect.com"
+          ],
+          "desc": "Shopping mall dedicated monitoring. Metric scraping for gateway and APIs.",
+          "status": "deployed"
+        },
+        {
+          "name": "imgproxy CDN",
+          "domains": [
+            "image.posselect.com (imgproxy resizing)",
+            "static.posselect.com (MinIO direct serving)"
+          ],
+          "desc": "Dynamic image resizing server. Provides signed URLs based on MinIO.",
+          "status": "deployed"
+        },
+        {
+          "name": "posselect-ui",
+          "domains": [
+            "storybook.posselect.com",
+            "ui.posselect.com (alias)"
+          ],
+          "desc": "Design system reference page. Storybook environment improved with responsive/multi-language components and accessibility checks.",
+          "status": "deployed"
+        },
+        {
+          "name": "posselect-shell",
+          "domains": [
+            "shell.posselect.com"
+          ],
+          "desc": "Runtime shell for common header/footer and category drawer (static serving).",
+          "status": "deployed"
+        }
+      ],
+      "mail": [
+        {
+          "name": "Self-hosted Mail (docker-mailserver)",
+          "domains": [
+            "customer-service@leedohyun.com",
+            "customer-service@posselect.com"
+          ],
+          "desc": "Sends auth emails/order notifications, DKIM signed for both domains",
+          "status": "deployed"
+        }
+      ],
+      "databases": [
+        {
+          "name": "MySQL",
+          "services": [
+            "WordPress",
+            "Redmine"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (keycloak)",
+          "services": [
+            "Keycloak"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (catalog-postgres, orders-postgres)",
+          "services": [
+            "product-api",
+            "order-api"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "PostgreSQL (postgres-service, customer ns)",
+          "services": [
+            "Legacy, not used for authentication"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "cache": [
+        {
+          "name": "Redis (default ns)",
+          "services": [
+            "WordPress"
+          ],
+          "status": "deployed"
+        },
+        {
+          "name": "Redis (customer ns)",
+          "services": [
+            "product-api cart"
+          ],
+          "status": "deployed"
+        }
+      ],
+      "infrastructure": [
+        {
+          "name": "Traefik Ingress (kube-system)",
+          "status": "deployed"
+        },
+        {
+          "name": "cert-manager (Wildcard *.leedohyun.com + *.posselect.com, separate certificates for each)",
+          "status": "deployed"
+        },
+        {
+          "name": "MetalLB",
+          "status": "deployed"
+        },
+        {
+          "name": "coredns",
+          "status": "deployed"
+        },
+        {
+          "name": "metrics-server",
+          "status": "deployed"
+        },
+        {
+          "name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)",
+          "desc": "Prometheus/Grafana/Alertmanager monitoring stack. Email alert integration.",
+          "status": "deployed"
+        },
+        {
+          "name": "Loki / Promtail",
+          "desc": "Cluster-wide container log collection for all namespaces.",
+          "status": "deployed"
+        },
+        {
+          "name": "Jaeger (Distributed Tracing)",
+          "desc": "Java backend distributed tracing (OTel).",
+          "status": "deployed"
+        },
+        {
+          "name": "Velero (Backup Automation)",
+          "desc": "Daily automated backup of PVC data based on MinIO.",
+          "status": "deployed"
+        }
+      ],
+      "cicd": [
+        {
+          "name": "GitHub Actions CI (Image build+push)",
+          "scope": "All repositories",
+          "status": "deployed"
+        },
+        {
+          "name": "self-hosted runner CD (Auto deployment)",
+          "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
+          "status": "deployed"
+        },
+        {
+          "name": "Manual deployment",
+          "scope": "architecture-web, wordpress, tool, etc.",
+          "status": "manual"
+        }
+      ]
+    },
+    "issues": [
+      "Security hardening not applied (RBAC granularity, NetworkPolicy, Istio mTLS — planned only)",
+      "Distributed tracing only measures 4 Java backends (Next.js frontends not measured), no Kiali/Service Mesh observability yet",
+      "Single point of failure (Single node cluster, no redundancy)",
+      "Alertmanager only integrated with Email, additional channels like Slack not integrated",
+      "Self-hosted mail server uses home dynamic IP+no PTR, potential spam folder delivery (Structural limit)",
+      "architecture-web/tool/wordpress are still deployed manually",
+      "customer.front needs social login (Kakao/Naver/Google) and phone verification backend integration",
+      "Velero needs periodic (e.g. 3 months) recovery validation routine"
+    ]
+  },
+  "domain_split": {
+    "title": "Domain Restructuring: Separation of leedohyun.com (Personal) / posselect.com (Shop) (2026-08-02)",
+    "summary": "Completed domain separation between leedohyun.com (Personal) and posselect.com (Shopping mall). K3s infrastructure is shared, but Auth/Routing/DNS layers are operated independently.",
+    "leedohyun_com": [
+      "leedohyun.com/www → Redirects to blog.leedohyun.com",
+      "blog/wordpress",
+      "alm/redmine",
+      "minio/static",
+      "tool",
+      "architecture",
+      "router",
+      "monitoring"
+    ],
+    "posselect_com": [
+      "posselect.com/www → Redirects to home.posselect.com",
+      "home",
+      "customer",
+      "product",
+      "admin",
+      "keycloak"
+    ],
+    "migrated_items": [
+      "Route53: New posselect.com hosted zone and record separation",
+      "TLS: Dedicated wildcard certificate separation for posselect.com",
+      "Ingress: Separation of routing entry points by domain",
+      "Gateway: Domain independence secured through externalized security configs",
+      "Keycloak: Separation of shopping mall dedicated authentication server",
+      "Mail: Setup of dedicated mail server account for the shopping mall"
+    ],
+    "backward_compat": "Legacy leedohyun.com based hosts redirect to posselect.com with 302 to maintain compatibility."
+  },
+  "resources": {
+    "cpu": "~5% (Based on single 6-core Ryzen 5 1600)",
+    "memory": "~19% (Based on 62Gi DDR4 Dual Channel)",
+    "nodes": 1,
+    "cluster_type": "K3s v1.33 (Single node, control-plane + worker)"
+  },
+  "updated_at": "2026-08-15",
+  "improved": [
+    {
+      "name": "Spring Cloud Gateway Single Entry Point",
+      "domains": [
+        "Gateway-based traffic routing processing completed"
+      ],
+      "status": "deployed",
+      "status_text": "Completed"
+    },
+    {
+      "name": "Prometheus / Grafana",
+      "domains": [
+        "Production service and DB metric integration completed"
+      ],
+      "status": "deployed",
+      "status_text": "Completed"
+    },
+    {
+      "name": "Loki / Promtail (Log Collection)",
+      "domains": [
+        "Global log collection and 14-day retention"
+      ],
+      "status": "deployed",
+      "status_text": "Completed"
+    },
+    {
+      "name": "Alertmanager External Alerts",
+      "domains": [
+        "Email alert channel integration completed. Additional channels planned later"
+      ],
+      "status": "deployed",
+      "status_text": "Completed(Email)"
+    },
+    {
+      "name": "Jaeger (Distributed Tracing)",
+      "domains": [
+        "4 Java backends automatic instrumentation completed"
+      ],
+      "status": "deployed",
+      "status_text": "Completed"
+    },
+    {
+      "name": "Velero (Backup Automation)",
+      "domains": [
+        "All namespaces daily backup configuration completed"
+      ],
+      "status": "deployed",
+      "status_text": "Completed"
+    },
+    {
+      "name": "Kiali",
+      "domains": [
+        "Service Mesh observability — Pending due to Istio dependency"
+      ],
+      "status": "planned",
+      "status_text": "Planned"
+    }
+  ],
+  "roadmap": {
+    "desc": "The current K3s single node system is a transitional infrastructure. We plan a large-scale expansion to a managed cloud infrastructure along with the introduction of VOD and live streaming as the shopping mall service traffic grows.",
+    "items": [
+      {
+        "name": "Infrastructure Independence of URL Path Design",
+        "domains": [
+          "MinIO bucket and path independent design considering S3 migration"
+        ],
+        "status": "deployed",
+        "status_text": "Principle Confirmed"
+      },
+      {
+        "name": "Establish CDN Bucket Naming Convention",
+        "domains": [
+          "Bucket configuration principle based on content type (shop/static, shop/image)"
+        ],
+        "status": "deployed",
+        "status_text": "Confirmed"
+      },
+      {
+        "name": "VOD (Video on Demand)",
+        "domains": [
+          "Plan to introduce managed VOD service for CPU-intensive transcoding"
+        ],
+        "status": "planned",
+        "status_text": "Planned"
+      },
+      {
+        "name": "Real-time Live Streaming",
+        "domains": [
+          "Expansion of live streaming features based on managed services like AWS IVS"
+        ],
+        "status": "planned",
+        "status_text": "Planned"
+      },
+      {
+        "name": "Subdomain → Single CDN Domain Integration",
+        "domains": [
+          "Consider integration to a single CDN domain + Path-based structure in the future"
+        ],
+        "status": "planned",
+        "status_text": "Under Review"
+      }
+    ]
+  }
+}
