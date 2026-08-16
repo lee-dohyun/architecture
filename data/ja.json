@@ -341,7 +341,111 @@
       "nodes": 1,
       "cluster_type": "[JA] K3s v1.33 (단일 노드, control-plane 겸 worker)"
     },
-    "updated_at": "2026-08-15"
+    "updated_at": "2026-08-15",
+    "improved": [
+      {
+        "name": "[JA] Spring Cloud Gateway 단일 진입점",
+        "domains": [
+          "[JA] 2026-07-27 전환, 2026-08-02 posselect.com까지 확장 — 실제 운영 중"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨"
+      },
+      {
+        "name": "Prometheus / Grafana",
+        "domains": [
+          "[JA] monitoring.posselect.com — 2026-07-29 배포, 2026-08-02 posselect.com 이전 + 쇼핑몰 실제 서비스/DB/Redis 메트릭 연결 완료"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨"
+      },
+      {
+        "name": "[JA] Loki / Promtail (로그 수집)",
+        "domains": [
+          "[JA] 2026-08-04 완료 — 전 네임스페이스 로그, 보관 14일"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨"
+      },
+      {
+        "name": "[JA] Alertmanager 외부 알림",
+        "domains": [
+          "[JA] 2026-08-04: Email 채널 연동 완료(자체 메일서버 경유). Slack 등 추가 채널은 아직 계획 단계"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨(Email)"
+      },
+      {
+        "name": "[JA] Jaeger (분산 트레이싱)",
+        "domains": [
+          "[JA] 2026-08-04 완료 — Java 백엔드 4개 OTel 자동계측(HTTP+JDBC 스팬). Next.js 프론트 4개는 미계측, UI 미노출"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨"
+      },
+      {
+        "name": "[JA] Velero (백업 자동화)",
+        "domains": [
+          "[JA] 2026-08-04 완료 — 전 네임스페이스 매일 백업(보관 10일), MinIO 저장. restore 리허설은 아직 미검증"
+        ],
+        "status": "deployed",
+        "status_text": "[JA] 완료됨"
+      },
+      {
+        "name": "Kiali",
+        "domains": [
+          "[JA] 서비스 메시 관찰성 — Istio 의존이라 보류"
+        ],
+        "status": "planned",
+        "status_text": "[JA] 계획됨"
+      }
+    ],
+    "roadmap": {
+      "desc": "[JA] 현재의 홈서버 K3s 단일 노드 시스템은 최종 형태가 아니라 과도기 상태로 간주한다. 장기 계획은 서비스가 커지면 클라우드로 전환해서 대규모로 확장하는 것이며, 여기에는 이미지뿐 아니라 비디오·실시간 라이브 스트리밍 제공까지 포함된다. 이 서버(Ryzen 5 1600, 6코어 단일 노드)는 트랜스코딩/라이브 스트리밍 같은 CPU·대역폭 집약적 워크로드를 감당할 수 없으므로, 설계 시점부터 이를 염두에 둔다.",
+      "items": [
+        {
+          "name": "[JA] 이름/URL 계약 층과 백엔드 인프라 층 분리",
+          "domains": [
+            "[JA] 오브젝트 스토리지의 버킷/prefix 이름, URL 경로 구조를 특정 백엔드(MinIO)에 종속되지 않게 설계 — MinIO가 S3 API 호환이라 지금 짓는 키 이름이 이미 실제 S3 키인 것처럼 설계하면, 나중에 백엔드만(MinIO→S3, imgproxy→CloudFront 등) 교체하는 lift-and-shift가 가능해짐"
+          ],
+          "status": "deployed",
+          "status_text": "[JA] 원칙 확정"
+        },
+        {
+          "name": "[JA] 쇼핑몰 CDN 버킷/prefix 명명 규칙",
+          "domains": [
+            "[JA] shop/static/ (정적 빌드 자산), shop/image/ (상품·브랜드 이미지, imgproxy 가공)",
+            "[JA] 짧고 콘텐츠 타입 기준이라 나중에 shop/video/, shop/live/를 옆에 붙일 수 있음. design-assets 버킷(브랜드 자산 전용)은 이 구조와 별개로 유지"
+          ],
+          "status": "deployed",
+          "status_text": "[JA] 확정"
+        },
+        {
+          "name": "[JA] VOD (주문형 비디오)",
+          "domains": [
+            "[JA] 자체 호스팅 대신 처음부터 매니지드 클라우드 서비스로(Cloudflare Stream, Mux 등) — 트랜스코딩은 CPU 집약적이라 단일 노드로 감당 불가, 자체 호스팅 후 재이전하는 이중 작업을 피함"
+          ],
+          "status": "planned",
+          "status_text": "[JA] 계획됨"
+        },
+        {
+          "name": "[JA] 실시간 라이브 스트리밍",
+          "domains": [
+            "[JA] AWS IVS/MediaConvert 등 매니지드 서비스 — 저지연 인제스트+실시간 트랜스코딩+엣지 분산까지 필요해 홈서버로는 사실상 불가능한 영역"
+          ],
+          "status": "planned",
+          "status_text": "[JA] 계획됨"
+        },
+        {
+          "name": "[JA] 서브도메인 → 단일 CDN 도메인 통합",
+          "domains": [
+            "[JA] 지금은 image.posselect.com/static.posselect.com처럼 종류별 서브도메인이지만, 실제 대규모 이커머스(Shopify, Amazon)는 단일 CDN 도메인 + 경로(path) prefix로 구분하는 패턴을 씀. video 추가 시점이나 실제 클라우드 이전 시점에 cdn.posselect.com/<type>/... 형태로 통합을 고려 — 지금 당장 갈아엎을 필요는 없음"
+          ],
+          "status": "planned",
+          "status_text": "[JA] 검토 대상"
+        }
+      ]
+    }
   },
   "mermaid": {
     "posselect": "\n[JA]             Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]\n[JA]             DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n[JA]             Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n[JA]             Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n[JA]             IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]\n[JA]             UI -.->|서명 URL| IP\n\n[JA]             GF -.->|메트릭 스크레이핑| GW\n[JA]             GF -.->|메트릭 스크레이핑| AA\n[JA]             GF -.->|메트릭 스크레이핑| PA\n[JA]             GF -.->|메트릭 스크레이핑| OA\n[JA]             GF -.->|익스포터 경유| PG2\n[JA]             GF -.->|익스포터 경유| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog]\n            OA --> PG3[PostgreSQL<br/>orders]\n[JA]             PA --> Redis2[Redis<br/>장바구니]\n        ",

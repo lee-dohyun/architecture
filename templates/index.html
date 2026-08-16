@@ -1,713 +1,272 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSA 아키텍처 구조도</title>
+    <title>{{ t.ui.title }}</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', filename='favicon-192x192.png') }}" sizes="192x192" />
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon-180x180.png') }}" />
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 300;
-        }
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.8;
-            font-size: 1.1em;
-        }
-        .content {
-            padding: 30px;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-        .tab {
-            padding: 15px 30px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        .tab.active {
-            border-bottom-color: #3498db;
-            color: #3498db;
-        }
-        .tab:hover {
-            background-color: #f8f9fa;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .diagram-container {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            overflow-x: auto;
-        }
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        .service-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-left: 4px solid #3498db;
-            transition: transform 0.3s ease;
-        }
-        .service-card:hover {
-            transform: translateY(-5px);
-        }
-        .service-card.deployed {
-            border-left-color: #27ae60;
-        }
-        .service-card.planned {
-            border-left-color: #f39c12;
-        }
-        .service-card h3 {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
-        }
-        .service-card .domains {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin: 5px 0;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-        .status-deployed {
-            background: #d5f4e6;
-            color: #27ae60;
-        }
-        .status-planned {
-            background: #fef5e7;
-            color: #f39c12;
-        }
-        .issues-list {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .issues-list h3 {
-            color: #e53e3e;
-            margin-top: 0;
-        }
-        .issues-list ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .issues-list li {
-            margin: 8px 0;
-            color: #4a5568;
-        }
-        .resource-info {
-            background: #e6fffa;
-            border: 1px solid #81e6d9;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .resource-info h3 {
-            color: #234e52;
-            margin-top: 0;
-        }
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .resource-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .resource-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2d3748;
-        }
-        .resource-label {
-            color: #718096;
-            font-size: 0.9em;
-        }
-        .domains a {
-            color: #3182ce;
-            text-decoration: none;
-            border-bottom: 1px dotted #3182ce;
-        }
-        .domains a:hover {
-            color: #2c5282;
-            border-bottom-style: solid;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 2.5em; font-weight: 300; }
+        .header p { margin: 10px 0 0 0; opacity: 0.8; font-size: 1.1em; }
+        .content { padding: 30px; }
+        .tabs { display: flex; margin-bottom: 30px; border-bottom: 2px solid #ecf0f1; }
+        .tab { padding: 15px 30px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s ease; font-weight: 500; }
+        .tab.active { border-bottom-color: #3498db; color: #3498db; }
+        .tab:hover { background-color: #f8f9fa; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .diagram-container { background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .service-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-left: 4px solid #3498db; transition: transform 0.3s ease; }
+        .service-card:hover { transform: translateY(-5px); }
+        .service-card.deployed { border-left-color: #27ae60; }
+        .service-card.planned { border-left-color: #f39c12; }
+        .service-card.manual { border-left-color: #e74c3c; }
+        .service-card.review { border-left-color: #9b59b6; }
+        .service-card.decided { border-left-color: #1abc9c; }
+        .service-card.confirmed { border-left-color: #34495e; }
+        .service-card h3 { margin: 0 0 10px 0; color: #2c3e50; }
+        .service-card .domains { color: #7f8c8d; font-size: 0.9em; margin: 5px 0; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 500; text-transform: uppercase; }
+        .status-deployed { background: #d5f4e6; color: #27ae60; }
+        .status-planned { background: #fef5e7; color: #f39c12; }
+        .status-manual { background: #fadbd8; color: #e74c3c; }
+        .status-review { background: #f4ecf8; color: #9b59b6; }
+        .status-decided { background: #d1f2eb; color: #1abc9c; }
+        .status-confirmed { background: #d5d8dc; color: #34495e; }
+        .issues-list { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .issues-list h3 { color: #e53e3e; margin-top: 0; }
+        .issues-list ul { margin: 0; padding-left: 20px; }
+        .issues-list li { margin: 8px 0; color: #4a5568; }
+        .resource-info { background: #e6fffa; border: 1px solid #81e6d9; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .resource-info h3 { color: #234e52; margin-top: 0; }
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .resource-item { background: white; padding: 15px; border-radius: 8px; text-align: center; }
+        .resource-value { font-size: 1.5em; font-weight: bold; color: #2d3748; }
+        .resource-label { color: #718096; font-size: 0.9em; }
+        .domains a { color: #3182ce; text-decoration: none; border-bottom: 1px dotted #3182ce; }
+        .domains a:hover { color: #2c5282; border-bottom-style: solid; }
+        .lang-switcher a { color: white; margin: 0 10px; text-decoration: none; opacity: 0.7; transition: opacity 0.3s; }
+        .lang-switcher a:hover { opacity: 1; }
+        .lang-switcher a.active { font-weight: bold; opacity: 1; border-bottom: 1px solid white; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>MSA 아키텍처 구조도</h1>
-            <p>K3s 클러스터 마이크로서비스 아키텍처 현황 및 개선 계획</p>
-            <p style="opacity:0.6; font-size:0.9em; margin-top:8px;">최종 업데이트: {{ data.updated_at }}</p>
+            <h1>{{ t.ui.title }}</h1>
+            <p>{{ t.ui.subtitle }}</p>
+            <p style="opacity:0.6; font-size:0.9em; margin-top:8px;">{{ t.ui.last_updated }}{{ t.data.updated_at }}</p>
+            <div class="lang-switcher" style="margin-top: 15px;">
+                <a href="/ko/" class="{% if lang == 'ko' %}active{% endif %}">한국어</a>
+                <a href="/en/" class="{% if lang == 'en' %}active{% endif %}">English</a>
+                <a href="/ja/" class="{% if lang == 'ja' %}active{% endif %}">日本語</a>
+                <a href="/zh/" class="{% if lang == 'zh' %}active{% endif %}">中文</a>
+            </div>
         </div>
         
         <div class="content">
             <div class="tabs">
-                <div class="tab active" onclick="showTab('posselect')">posselect.com</div>
-                <div class="tab" onclick="showTab('leedohyun')">leedohyun.com</div>
-                <div class="tab" onclick="showTab('infra')">공통 인프라</div>
-                <div class="tab" onclick="showTab('domainsplit')">도메인 구성</div>
-                <div class="tab" onclick="showTab('improved')">개선 계획</div>
-                <div class="tab" onclick="showTab('roadmap')">장기 로드맵</div>
-                <div class="tab" onclick="showTab('resources')">리소스 현황</div>
+                <div class="tab active" onclick="showTab('posselect')">{{ t.ui.tab_posselect }}</div>
+                <div class="tab" onclick="showTab('leedohyun')">{{ t.ui.tab_leedohyun }}</div>
+                <div class="tab" onclick="showTab('infra')">{{ t.ui.tab_infra }}</div>
+                <div class="tab" onclick="showTab('domainsplit')">{{ t.ui.tab_domainsplit }}</div>
+                <div class="tab" onclick="showTab('improved')">{{ t.ui.tab_improved }}</div>
+                <div class="tab" onclick="showTab('roadmap')">{{ t.ui.tab_roadmap }}</div>
+                <div class="tab" onclick="showTab('resources')">{{ t.ui.tab_resources }}</div>
             </div>
             
+            {% macro service_card(svc) %}
+            <div class="service-card {{ svc.status }}">
+                <h3>{{ svc.name }}</h3>
+                {% for domain in svc.domains %}
+                <div class="domains">{{ domain }}</div>
+                {% endfor %}
+                {% if svc.desc %}
+                <div class="domains">{{ svc.desc }}</div>
+                {% endif %}
+                {% if svc.scope %}
+                <div class="domains">{{ svc.scope }}</div>
+                {% endif %}
+                <span class="status-badge status-{{ svc.status }}">
+                    {% if svc.status_text %}
+                        {{ svc.status_text }}
+                    {% elif svc.status == 'deployed' %}
+                        {{ t.ui.status_deployed }}
+                    {% elif svc.status == 'planned' %}
+                        {{ t.ui.status_planned }}
+                    {% elif svc.status == 'manual' %}
+                        {{ t.ui.status_manual }}
+                    {% elif svc.status == 'review' %}
+                        {{ t.ui.status_review }}
+                    {% elif svc.status == 'decided' %}
+                        {{ t.ui.status_decided }}
+                    {% elif svc.status == 'confirmed' %}
+                        {{ t.ui.status_confirmed }}
+                    {% else %}
+                        {{ svc.status }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endmacro %}
+
             <div id="posselect" class="tab-content active">
-                <h2>posselect.com — 쇼핑몰 서비스</h2>
-
+                <h2>{{ t.ui.tab_posselect }} — 쇼핑몰 서비스</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph TB
-                            Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]
-                            DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]
-                            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]
-                            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]
-
-                            GW --> HF[home.front]
-                            GW --> CF[customer.front]
-                            GW --> PF[product.front]
-                            GW --> ADF[admin.front]
-                            GW --> AA[auth.api]
-                            GW --> PA[product-api]
-                            GW --> OA[order-api]
-                            GW --> KC[Keycloak<br/>keycloak.posselect.com]
-                            GW --> GF[Grafana<br/>monitoring.posselect.com]
-                            GW --> IP[imgproxy<br/>image.posselect.com]
-                            GW --> UI[posselect-ui<br/>ui.posselect.com]
-
-                            AA --> KC
-                            ADF -.-> KC
-                            CF -.-> AA
-                            HF -.-> AA
-                            PA -.-> OA
-                            IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]
-                            UI -.->|서명 URL| IP
-
-                            GF -.->|메트릭 스크레이핑| GW
-                            GF -.->|메트릭 스크레이핑| AA
-                            GF -.->|메트릭 스크레이핑| PA
-                            GF -.->|메트릭 스크레이핑| OA
-                            GF -.->|익스포터 경유| PG2
-                            GF -.->|익스포터 경유| Redis2
-
-                            KC --> PG1[PostgreSQL]
-                            PA --> PG2[PostgreSQL<br/>catalog]
-                            OA --> PG3[PostgreSQL<br/>orders]
-                            PA --> Redis2[Redis<br/>장바구니]
-
-                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            class HF,CF,PF,ADF,AA,PA,OA,KC,GF,GW,Traefik,PG1,PG2,PG3,Redis2,IP,UI,MO2 deployed
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.posselect | safe }}</div>
                 </div>
-
                 <div class="service-grid">
-                    <div class="service-card deployed">
-                        <h3>home.front</h3>
-                        <div class="domains">home.posselect.com</div>
-                        <div class="domains">쇼핑몰 메인 랜딩 페이지</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>customer.front / auth.api</h3>
-                        <div class="domains">customer.posselect.com</div>
-                        <div class="domains">로그인/회원가입/이메일 인증, Keycloak(customer realm) 위임 인증</div>
-                        <div class="domains">2026-08-04: 아이디 찾기, 비밀번호 찾기, 로그인 상태 유지(리프레시 토큰 자동 갱신) 추가. 간편 로그인/휴대폰 인증은 UI만 존재, 별도 이슈로 분리</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>product.front / product-api</h3>
-                        <div class="domains">product.posselect.com</div>
-                        <div class="domains">상품 목록/장바구니 — 비로그인도 이용 가능</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>order-api</h3>
-                        <div class="domains">/api/orders/** (customer/product.posselect.com)</div>
-                        <div class="domains">주문/결제(mock), 결제완료 시 메일 발송</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>admin.front</h3>
-                        <div class="domains">admin.posselect.com</div>
-                        <div class="domains">관리자 백오피스, Keycloak(staff realm) 로그인</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Keycloak</h3>
-                        <div class="domains">keycloak.posselect.com</div>
-                        <div class="domains">SSO/OAuth2·OIDC — 쇼핑몰 전용, 개인 서비스와 완전 분리</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Grafana</h3>
-                        <div class="domains">monitoring.posselect.com</div>
-                        <div class="domains">쇼핑몰 실제 서비스 메트릭 스크레이핑(gateway/auth-api/order-api/product-api + postgres/redis exporter)</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>imgproxy CDN</h3>
-                        <div class="domains">image.posselect.com (imgproxy 리사이징), static.posselect.com (MinIO 직접 서빙)</div>
-                        <div class="domains">2026-08-05: 2026-08-02부터 배포만 되어 있던 인프라를 처음 실사용 — MinIO에 design-assets 버킷(브랜드 로고/파비콘) 신규 구축, 서명 URL로 imgproxy 경유 서빙</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>posselect-ui</h3>
-                        <div class="domains">ui.posselect.com</div>
-                        <div class="domains">디자인 시스템 레퍼런스 페이지(claude.ai 디자인 툴 standalone export를 nginx로 서빙). 2026-08-05: 임베디드 base64 로고/파비콘 6종을 image.posselect.com CDN 참조로 전환</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
+                    {% for svc in t.data.current.services.shop_line %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
                 </div>
-
                 <div class="issues-list">
-                    <h3>⚠️ posselect.com 쪽 문제점</h3>
+                    <h3>⚠️ {{ t.ui.issues_posselect }}</h3>
                     <ul>
-                        <li>customer.front 간편 로그인(카카오/네이버/구글)·휴대폰 본인인증·약관 실제 페이지·마케팅 수신동의 백엔드 저장 미구현 (UI만 존재)</li>
+                        <li>{{ t.data.current.issues[6] }}</li>
                     </ul>
                 </div>
             </div>
 
             <div id="leedohyun" class="tab-content">
-                <h2>leedohyun.com — 개인 서비스</h2>
-
+                <h2>{{ t.ui.tab_leedohyun }} — 개인 서비스</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph TB
-                            Internet[인터넷] --> DNS1[Route 53<br/>leedohyun.com]
-                            DNS1 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]
-                            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]
-                            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]
-
-                            GW --> WP[WordPress<br/>leedohyun.com / blog]
-                            GW --> RM[Redmine<br/>alm / redmine]
-                            GW --> MO[MinIO<br/>minio / static]
-                            GW --> TL[Tool]
-                            GW --> AW[Architecture Web<br/>지금 보고 계신 이 페이지]
-                            GW --> RT[라우터 관리화면 프록시]
-
-                            WP --> MySQL1[MySQL]
-                            RM --> MySQL1
-                            WP --> Redis1[Redis]
-
-                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            class WP,RM,MO,TL,AW,RT,GW,Traefik,MySQL1,Redis1 deployed
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.leedohyun | safe }}</div>
                 </div>
-
                 <div class="service-grid">
-                    <div class="service-card deployed">
-                        <h3>WordPress</h3>
-                        <div class="domains">leedohyun.com, blog.leedohyun.com</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Redmine</h3>
-                        <div class="domains">alm.leedohyun.com, redmine.leedohyun.com</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>MinIO</h3>
-                        <div class="domains">minio.leedohyun.com, static.leedohyun.com</div>
-                        <div class="domains">S3 호환 객체 스토리지. Velero 백업 저장소로도 재사용(공통 인프라 탭 참고). 2026-08-05: 개인용 버킷뿐 아니라 posselect.com 쪽 shop-images/shop-static/design-assets 버킷도 같은 인스턴스를 공유 — 자세한 건 posselect.com 탭의 imgproxy CDN 참고</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Tool</h3>
-                        <div class="domains">tool.leedohyun.com</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Architecture Web</h3>
-                        <div class="domains">architecture.leedohyun.com, architecture.posselect.com</div>
-                        <div class="domains">지금 보고 계신 이 페이지 (Flask) — 두 도메인 모두 같은 서버로 진입</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>라우터 관리화면 프록시</h3>
-                        <div class="domains">router.leedohyun.com → 가정용 라우터 관리 UI</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
+                    {% for svc in t.data.current.services.personal_line %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
                 </div>
-
                 <div class="issues-list">
-                    <h3>⚠️ leedohyun.com 쪽 문제점</h3>
+                    <h3>⚠️ {{ t.ui.issues_leedohyun }}</h3>
                     <ul>
-                        <li>architecture-web/tool/wordpress는 여전히 수동 배포 (CI는 있으나 CD 없음)</li>
+                        <li>{{ t.data.current.issues[5] }}</li>
                     </ul>
                 </div>
             </div>
 
             <div id="infra" class="tab-content">
-                <h2>공통 인프라 / 관찰성 — 두 도메인이 함께 쓰는 것들</h2>
-                <p style="color:#4a5568; line-height:1.6;">
-                    Spring Cloud Gateway를 비롯해 클러스터 인프라, 모니터링·로그·트레이싱·백업, 메일서버,
-                    CI/CD는 leedohyun.com과 posselect.com이 전부 공유한다. 도메인별 구조도에 이 항목들을
-                    매번 반복하면 오히려 파악하기 어려워져서 별도 탭으로 뺐다.
-                </p>
-
+                <h2>{{ t.ui.tab_infra }} — 두 도메인이 함께 쓰는 것들</h2>
+                <p style="color:#4a5568; line-height:1.6;">{{ t.ui.infra_desc }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph TB
-                            GW[Spring Cloud Gateway<br/>두 도메인 공용 진입점] -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]
-
-                            PROM[Prometheus] --> GF2[Grafana]
-                            GF2 --> AM[Alertmanager<br/>Email 알림]
-                            LOKI[Loki / Promtail<br/>로그 수집]
-                            JG[Jaeger<br/>분산 트레이싱]
-                            VL[Velero<br/>PVC 백업]
-
-                            PROM -.->|메트릭 스크레이핑| GW
-                            LOKI -.->|전 네임스페이스| GW
-                            JG -.->|OTel javaagent| GW
-                            VL -.->|node-agent, MinIO에 저장| MO[MinIO]
-
-                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            class GW,MAIL,PROM,GF2,AM,LOKI,JG,VL,MO deployed
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.infra | safe }}</div>
                 </div>
-
                 <div class="service-grid">
-                    <div class="service-card deployed">
-                        <h3>Spring Cloud Gateway</h3>
-                        <div class="domains">*.leedohyun.com + *.posselect.com 전체의 실제 진입점 (2026-08-02부로 두 도메인 공유)</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>클러스터 인프라</h3>
-                        <div class="domains">Traefik Ingress(kube-system), cert-manager(와일드카드 *.leedohyun.com + *.posselect.com 각각 별도 Certificate), MetalLB, coredns, metrics-server</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Prometheus / Grafana / Alertmanager</h3>
-                        <div class="domains">kube-prometheus-stack. Alertmanager는 Email 채널 연동 완료(자체 메일서버 경유), Slack 등 추가 채널 미연동</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Loki / Promtail</h3>
-                        <div class="domains">전 네임스페이스 로그 수집, 보관 14일 — Grafana Explore에서 조회</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Jaeger</h3>
-                        <div class="domains">분산 트레이싱 — Java 백엔드 4개(gateway/auth-api/order-api/product-api) OTel 자동계측, HTTP+JDBC 스팬 수집. UI 미노출(port-forward 전용), Next.js 프론트는 미계측</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Velero</h3>
-                        <div class="domains">전 네임스페이스 매일 백업(보관 10일), MinIO에 저장. 백업 성공은 확인, restore 리허설은 미검증</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>자체 메일서버</h3>
-                        <div class="domains">customer-service@leedohyun.com, customer-service@posselect.com — 인증메일/주문알림 발신, 두 도메인 모두 DKIM 서명</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>CI / CD</h3>
-                        <div class="domains">GitHub Actions CI(전 저장소), self-hosted runner CD(gateway/auth.api/home.front/customer.front/admin.front/order.api/product.api). architecture-web/wordpress/tool은 수동 배포</div>
-                        <span class="status-badge status-deployed">배포됨</span>
-                    </div>
+                    {% for svc in t.data.current.services.gateway %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
+                    {% for svc in t.data.current.services.infrastructure %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
+                    {% for svc in t.data.current.services.mail %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
+                    {% for svc in t.data.current.services.cicd %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
                 </div>
-
                 <div class="issues-list">
-                    <h3>⚠️ 공통 인프라 문제점</h3>
+                    <h3>⚠️ {{ t.ui.issues_infra }}</h3>
                     <ul>
-                        <li>백업은 자동화됐으나(Velero) 실제 restore 리허설 미검증 — 백업 성공이 복구 가능을 보장하지 않음</li>
-                        <li>보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)</li>
-                        <li>분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트 4개는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음</li>
-                        <li>단일 장애점 (단일 노드 클러스터, 이중화 없음)</li>
-                        <li>Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동</li>
-                        <li>자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음</li>
+                        <li>{{ t.data.current.issues[7] }}</li>
+                        <li>{{ t.data.current.issues[0] }}</li>
+                        <li>{{ t.data.current.issues[1] }}</li>
+                        <li>{{ t.data.current.issues[2] }}</li>
+                        <li>{{ t.data.current.issues[3] }}</li>
+                        <li>{{ t.data.current.issues[4] }}</li>
                     </ul>
                 </div>
             </div>
 
             <div id="domainsplit" class="tab-content">
-                <h2>도메인 구성 — leedohyun.com(개인) / posselect.com(쇼핑몰) 분리 (2026-08-02)</h2>
-                <p style="color:#4a5568; line-height:1.6;">
-                    원래 쇼핑몰(customer 제품 라인)은 leedohyun.com의 서브도메인으로 얹혀 있었으나,
-                    별도 도메인 <strong>posselect.com</strong>을 신규 구매해 완전히 분리했다.
-                    K3s 클러스터·게이트웨이·메일서버는 계속 공유하되, DNS·TLS 인증서·Ingress·Keycloak·
-                    인증 쿠키까지 도메인 단위로 독립시켰다.
-                </p>
-
+                <h2>{{ t.ui.domain_split_title }}</h2>
+                <p style="color:#4a5568; line-height:1.6;">{{ t.data.domain_split.summary }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph LR
-                            subgraph before[이전: leedohyun.com 단일 도메인]
-                                B1[leedohyun.com] --> B2[home / customer / product / admin]
-                                B1 --> B3[blog / redmine / minio / tool / ...]
-                                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]
-                            end
-
-                            subgraph after[현재: 도메인 분리]
-                                A1[leedohyun.com<br/>개인 전용] --> A2[blog / redmine / minio / tool / architecture / router / monitoring]
-                                A3[posselect.com<br/>쇼핑몰 전용] --> A4[home / customer / product / admin]
-                                A3 --> A5[Keycloak<br/>keycloak.posselect.com]
-                            end
-
-                            before -.전환.-> after
-
-                            classDef old fill:#fef5e7,stroke:#f39c12,stroke-width:2px
-                            classDef new fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            class B1,B2,B3,B4 old
-                            class A1,A2,A3,A4,A5 new
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.domainsplit | safe }}</div>
                 </div>
-
                 <div class="service-grid">
                     <div class="service-card deployed">
                         <h3>leedohyun.com — 개인 전용</h3>
-                        <div class="domains">leedohyun.com/www → blog.leedohyun.com 리다이렉트</div>
-                        <div class="domains">blog·wordpress, alm·redmine, minio·static, tool, architecture, router, monitoring</div>
-                        <span class="status-badge status-deployed">배포됨</span>
+                        {% for domain in t.data.domain_split.leedohyun_com %}
+                        <div class="domains">{{ domain }}</div>
+                        {% endfor %}
+                        <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
                     <div class="service-card deployed">
                         <h3>posselect.com — 쇼핑몰 전용</h3>
-                        <div class="domains">posselect.com/www → home.posselect.com 리다이렉트</div>
-                        <div class="domains">home, customer, product, admin, keycloak</div>
-                        <span class="status-badge status-deployed">배포됨</span>
+                        {% for domain in t.data.domain_split.posselect_com %}
+                        <div class="domains">{{ domain }}</div>
+                        {% endfor %}
+                        <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
                     <div class="service-card deployed">
                         <h3>구 도메인 호환성</h3>
-                        <div class="domains">home/customer/product/admin/keycloak.leedohyun.com</div>
-                        <div class="domains">삭제하지 않고 posselect.com으로 302 리다이렉트 — 기존 북마크/링크 유지</div>
-                        <span class="status-badge status-deployed">배포됨</span>
+                        <div class="domains">{{ t.data.domain_split.backward_compat }}</div>
+                        <span class="status-badge status-deployed">{{ t.ui.status_deployed }}</span>
                     </div>
                 </div>
-
-                <h3 style="margin-top:30px;">이전하면서 바뀐 것들</h3>
+                <h3 style="margin-top:30px;">{{ t.ui.changes_title }}</h3>
                 <div class="issues-list" style="background:#f0fff4; border-color:#9ae6b4;">
                     <ul>
-                        <li>Route53: posselect.com 신규 호스팅 영역, A(root+wildcard)/MX/SPF/DMARC/DKIM 레코드 추가</li>
-                        <li>TLS: posselect.com 전용 와일드카드 Certificate 신규 발급 (leedohyun.com과 별개 관리)</li>
-                        <li>Ingress: posselect-com-ingress.yaml 신규 (기존과 동일한 단일 진입점 패턴)</li>
-                        <li>게이트웨이: 인증 관련 하드코딩 값(EXPECTED_ISSUER, PROTECTED_HOSTS 등)을 property로 외부화 — 다음 도메인 이전 때 코드 수정 불필요</li>
-                        <li>쿠키: ACCESS_TOKEN Domain을 .leedohyun.com → .posselect.com으로 전환</li>
-                        <li>Keycloak: KC_HOSTNAME을 keycloak.posselect.com으로 변경, 쇼핑몰 전용으로 완전 분리</li>
-                        <li>메일: customer-service@posselect.com 계정 신규 생성, DKIM 키 별도 발급</li>
+                        {% for item in t.data.domain_split.migrated_items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             
             <div id="improved" class="tab-content">
-                <h2>개선 계획</h2>
-                
+                <h2>{{ t.ui.tab_improved }}</h2>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph TB
-                            Internet[인터넷] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]
-                            DNS --> Router[개인 라우터]
-                            Router --> Traefik[Traefik Ingress]
-                            Traefik --> GW[Spring Cloud Gateway<br/>단일 진입점 - 이미 완료]
-                            Traefik --> Istio[Istio 서비스 메시<br/>mTLS]
-
-                            GW --> WP[WordPress]
-                            GW --> RM[Redmine]
-                            GW --> KC[Keycloak]
-                            GW --> Shop[쇼핑몰 - posselect.com]
-
-                            GW --> Monitor[모니터링/로그 스택<br/>Prometheus/Grafana/Loki - 완료]
-                            Monitor --> AlertManager[Alertmanager<br/>Email 완료, Slack 계획]
-
-                            GW --> Observability[관찰성 스택]
-                            Observability --> Kiali[Kiali]
-                            Observability --> Jaeger[Jaeger<br/>Java 백엔드 4개 완료]
-
-                            GW --> Storage[스토리지]
-                            Storage --> MinIO[MinIO]
-                            Storage --> Velero[Velero<br/>PVC 자동 백업 완료]
-
-                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
-
-                            class WP,RM,KC,Shop,MinIO,Traefik,GW,Monitor,Jaeger,Velero,AlertManager deployed
-                            class Kiali,Istio planned
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.improved | safe }}</div>
                 </div>
-
                 <div class="service-grid">
-                    <div class="service-card deployed">
-                        <h3>Spring Cloud Gateway 단일 진입점</h3>
-                        <div class="domains">2026-07-27 전환, 2026-08-02 posselect.com까지 확장 — 실제 운영 중</div>
-                        <span class="status-badge status-deployed">완료됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Prometheus / Grafana</h3>
-                        <div class="domains">monitoring.posselect.com — 2026-07-29 배포, 2026-08-02 posselect.com 이전 + 쇼핑몰 실제 서비스/DB/Redis 메트릭 연결 완료</div>
-                        <span class="status-badge status-deployed">완료됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Loki / Promtail (로그 수집)</h3>
-                        <div class="domains">2026-08-04 완료 — 전 네임스페이스 로그, 보관 14일</div>
-                        <span class="status-badge status-deployed">완료됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Alertmanager 외부 알림</h3>
-                        <div class="domains">2026-08-04: Email 채널 연동 완료(자체 메일서버 경유). Slack 등 추가 채널은 아직 계획 단계</div>
-                        <span class="status-badge status-deployed">완료됨(Email)</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Jaeger (분산 트레이싱)</h3>
-                        <div class="domains">2026-08-04 완료 — Java 백엔드 4개 OTel 자동계측(HTTP+JDBC 스팬). Next.js 프론트 4개는 미계측, UI 미노출</div>
-                        <span class="status-badge status-deployed">완료됨</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>Velero (백업 자동화)</h3>
-                        <div class="domains">2026-08-04 완료 — 전 네임스페이스 매일 백업(보관 10일), MinIO 저장. restore 리허설은 아직 미검증</div>
-                        <span class="status-badge status-deployed">완료됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>Kiali</h3>
-                        <div class="domains">서비스 메시 관찰성 — Istio 의존이라 보류</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
+                    {% for svc in t.data.improved %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
                 </div>
             </div>
             
             <div id="roadmap" class="tab-content">
-                <h2>장기 로드맵 — 클라우드 전환 및 대규모 확장 전제 (2026-08-06 확정)</h2>
-                <p style="color:#4a5568; line-height:1.6;">
-                    현재의 홈서버 K3s 단일 노드 시스템은 최종 형태가 아니라 <strong>과도기 상태</strong>로 간주한다.
-                    장기 계획은 서비스가 커지면 클라우드로 전환해서 대규모로 확장하는 것이며, 여기에는 이미지뿐
-                    아니라 비디오·실시간 라이브 스트리밍 제공까지 포함된다. 이 서버(Ryzen 5 1600, 6코어 단일 노드)는
-                    트랜스코딩/라이브 스트리밍 같은 CPU·대역폭 집약적 워크로드를 감당할 수 없으므로, 설계 시점부터
-                    이를 염두에 둔다.
-                </p>
-
+                <h2>{{ t.ui.roadmap_title }}</h2>
+                <p style="color:#4a5568; line-height:1.6;">{{ t.data.roadmap.desc }}</p>
                 <div class="diagram-container">
-                    <div class="mermaid">
-                        graph TB
-                            subgraph now["지금 — 홈서버 (과도기)"]
-                                direction TB
-                                MinIO2[MinIO<br/>shop/static, shop/image]
-                                ImgProxy[imgproxy<br/>이미지 가공]
-                            end
-
-                            subgraph later["나중 — 클라우드 전환 시점"]
-                                direction TB
-                                S3[S3 호환 스토리지<br/>동일한 키 구조 그대로 이전]
-                                CDN2[CloudFront / Cloudflare<br/>단일 cdn.posselect.com + 경로 구분]
-                            end
-
-                            subgraph newcap["신규 기능 — 처음부터 클라우드로"]
-                                direction TB
-                                Video[VOD<br/>Cloudflare Stream / Mux 등]
-                                Live[라이브 스트리밍<br/>AWS IVS / MediaConvert 등]
-                            end
-
-                            now -.->|"이름/URL 체계는 유지, 백엔드만 교체"| later
-
-                            classDef deployed fill:#d5f4e6,stroke:#27ae60,stroke-width:2px
-                            classDef planned fill:#fef5e7,stroke:#f39c12,stroke-width:2px
-
-                            class MinIO2,ImgProxy deployed
-                            class S3,CDN2,Video,Live planned
-                    </div>
+                    <div class="mermaid">{{ t.mermaid.roadmap | safe }}</div>
                 </div>
-
                 <div class="service-grid">
-                    <div class="service-card deployed">
-                        <h3>이름/URL 계약 층과 백엔드 인프라 층 분리</h3>
-                        <div class="domains">오브젝트 스토리지의 버킷/prefix 이름, URL 경로 구조를 특정 백엔드(MinIO)에 종속되지 않게 설계 — MinIO가 S3 API 호환이라 지금 짓는 키 이름이 이미 실제 S3 키인 것처럼 설계하면, 나중에 백엔드만(MinIO→S3, imgproxy→CloudFront 등) 교체하는 lift-and-shift가 가능해짐</div>
-                        <span class="status-badge status-deployed">원칙 확정</span>
-                    </div>
-                    <div class="service-card deployed">
-                        <h3>쇼핑몰 CDN 버킷/prefix 명명 규칙</h3>
-                        <div class="domains">shop/static/ (정적 빌드 자산), shop/image/ (상품·브랜드 이미지, imgproxy 가공)</div>
-                        <div class="domains">짧고 콘텐츠 타입 기준이라 나중에 shop/video/, shop/live/를 옆에 붙일 수 있음. design-assets 버킷(브랜드 자산 전용)은 이 구조와 별개로 유지</div>
-                        <span class="status-badge status-deployed">확정</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>VOD (주문형 비디오)</h3>
-                        <div class="domains">자체 호스팅 대신 처음부터 매니지드 클라우드 서비스로(Cloudflare Stream, Mux 등) — 트랜스코딩은 CPU 집약적이라 단일 노드로 감당 불가, 자체 호스팅 후 재이전하는 이중 작업을 피함</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>실시간 라이브 스트리밍</h3>
-                        <div class="domains">AWS IVS/MediaConvert 등 매니지드 서비스 — 저지연 인제스트+실시간 트랜스코딩+엣지 분산까지 필요해 홈서버로는 사실상 불가능한 영역</div>
-                        <span class="status-badge status-planned">계획됨</span>
-                    </div>
-                    <div class="service-card planned">
-                        <h3>서브도메인 → 단일 CDN 도메인 통합</h3>
-                        <div class="domains">지금은 image.posselect.com/static.posselect.com처럼 종류별 서브도메인이지만, 실제 대규모 이커머스(Shopify, Amazon)는 단일 CDN 도메인 + 경로(path) prefix로 구분하는 패턴을 씀. video 추가 시점이나 실제 클라우드 이전 시점에 cdn.posselect.com/&lt;type&gt;/... 형태로 통합을 고려 — 지금 당장 갈아엎을 필요는 없음</div>
-                        <span class="status-badge status-planned">검토 대상</span>
-                    </div>
+                    {% for svc in t.data.roadmap.items %}
+                        {{ service_card(svc) }}
+                    {% endfor %}
                 </div>
             </div>
 
             <div id="resources" class="tab-content">
-                <h2>리소스 현황</h2>
-                
+                <h2>{{ t.ui.tab_resources }}</h2>
                 <div class="resource-info">
-                    <h3>현재 클러스터 리소스 사용량</h3>
+                    <h3>{{ t.ui.resources_title }}</h3>
                     <div class="resource-grid">
                         <div class="resource-item">
-                            <div class="resource-value">{{ data.resources.cpu }}</div>
-                            <div class="resource-label">CPU 사용률</div>
+                            <div class="resource-value">{{ t.data.resources.cpu }}</div>
+                            <div class="resource-label">{{ t.ui.resource_cpu }}</div>
                         </div>
                         <div class="resource-item">
-                            <div class="resource-value">{{ data.resources.memory }}</div>
-                            <div class="resource-label">메모리 사용률</div>
+                            <div class="resource-value">{{ t.data.resources.memory }}</div>
+                            <div class="resource-label">{{ t.ui.resource_memory }}</div>
                         </div>
                         <div class="resource-item">
-                            <div class="resource-value">{{ data.resources.nodes }}</div>
-                            <div class="resource-label">노드 수</div>
+                            <div class="resource-value">{{ t.data.resources.nodes }}</div>
+                            <div class="resource-label">{{ t.ui.resource_nodes }}</div>
                         </div>
                         <div class="resource-item">
-                            <div class="resource-value">{{ data.resources.cluster_type }}</div>
-                            <div class="resource-label">클러스터 타입</div>
+                            <div class="resource-value">{{ t.data.resources.cluster_type }}</div>
+                            <div class="resource-label">{{ t.ui.resource_type }}</div>
                         </div>
                     </div>
                 </div>
@@ -716,12 +275,6 @@
     </div>
 
     <script>
-        // mermaid는 다이어그램을 그릴 때 텍스트 크기를 실제로 측정하는데, display:none인
-        // (비활성) 탭 안의 다이어그램은 크기가 0으로 측정되어 레이아웃 계산이 깨지고
-        // "Syntax error in text"로 잘못 표시되는 문제가 있다(실제로는 문법 오류가 아님).
-        // startOnLoad를 끄고, 모든 탭을 잠깐 전부 보이게 만든 상태에서 한 번에 렌더링한 뒤
-        // 원래 활성 탭만 남기고 다시 숨긴다 — 한 번 렌더링된 SVG는 탭을 숨겨도 유지되므로
-        // 이후 탭 전환은 showTab()이 보이기/숨기기만 토글하면 된다.
         mermaid.initialize({ startOnLoad: false });
         (async function renderAllMermaidDiagrams() {
             const tabContents = document.querySelectorAll('.tab-content');
@@ -731,12 +284,11 @@
                 await mermaid.run();
             } finally {
                 tabContents.forEach((tc) => tc.classList.remove('active'));
-                (originallyActive || tabContents[0]).classList.add('active');
+                if (originallyActive) originallyActive.classList.add('active');
+                else tabContents[0].classList.add('active');
             }
         })();
 
-        // .domains 안에 나오는 leedohyun.com/posselect.com 계열 도메인을 새 탭으로 열리는
-        // 링크로 자동 치환한다. 이메일 주소(@ 뒤 도메인)나 이미 링크로 감싸진 텍스트는 건너뛴다.
         function linkifyDomains() {
             const domainPattern = /(?<![@.\w])((?:[a-zA-Z0-9_-]+\.)*(?:leedohyun|posselect)\.com)\b/g;
             document.querySelectorAll('.domains').forEach((el) => {
@@ -749,24 +301,11 @@
         linkifyDomains();
 
         function showTab(tabName) {
-            // 모든 탭과 콘텐츠 숨기기
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // 선택된 탭과 콘텐츠 보이기
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
         }
-        
-        // API 상태 확인
-        fetch('/api/status')
-            .then(response => response.json())
-            .then(data => {
-                console.log('API Status:', data);
-            })
-            .catch(error => {
-                console.error('API Error:', error);
-            });
     </script>
 </body>
 </html>
