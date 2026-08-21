@@ -34,7 +34,9 @@
     "no_image": "无图片",
     "infra_desc": "Spring Cloud Gateway 以及集群基础设施、监控/日志/追踪/备份、邮件服务器、CI/CD 由 leedohyun.com 和 posselect.com 共享。为了避免在每个域的架构图中重复这些内容，将它们单独放在此标签页中。",
     "domain_split_title": "域名结构重组：leedohyun.com(个人) / posselect.com(商城) 分离 (2026-08-02)",
-    "roadmap_title": "长期路线图 — 以云端迁移及大规模扩展为前提 (2026-08-06 确定)"
+    "roadmap_title": "长期路线图 — 以云端迁移及大规模扩展为前提 (2026-08-06 确定)",
+    "commercial_title": "项目商业价值与架构优势",
+    "tab_commercial": "商业价值"
   },
   "data": {
     "current": {
@@ -55,14 +57,6 @@
             "domains": [
               "leedohyun.com",
               "blog.leedohyun.com"
-            ],
-            "status": "deployed"
-          },
-          {
-            "name": "Redmine",
-            "domains": [
-              "alm.leedohyun.com",
-              "redmine.leedohyun.com"
             ],
             "status": "deployed"
           },
@@ -197,8 +191,7 @@
           {
             "name": "MySQL",
             "services": [
-              "WordPress",
-              "Redmine"
+              "WordPress"
             ],
             "status": "deployed"
           },
@@ -318,7 +311,6 @@
       "leedohyun_com": [
         "leedohyun.com/www → 重定向至 blog.leedohyun.com",
         "blog/wordpress",
-        "alm/redmine",
         "minio/static",
         "tool",
         "architecture",
@@ -456,10 +448,10 @@
   },
   "mermaid": {
     "posselect": "\n            Internet[互联网] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            IP -.->|design-assets 存储桶| MO2[MinIO<br/>leedohyun.com 与标签页相同实例]\n            UI -.->|签名URL| IP\n\n            GF -.->|指标抓取| GW\n            GF -.->|指标抓取| AA\n            GF -.->|指标抓取| PA\n            GF -.->|指标抓取| OA\n            GF -.->|通过Exporter| PG2\n            GF -.->|通过Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>购物车]\n        ",
-    "leedohyun": "\n            Internet[互联网] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> RM[Redmine<br/>alm / redmine]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>您当前正在查看的页面]\n            GW --> RT[路由器管理代理]\n\n            WP --> MySQL1[MySQL]\n            RM --> MySQL1\n            WP --> Redis1[Redis]\n        ",
+    "leedohyun": "\n            Internet[互联网] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>您当前正在查看的页面]\n            GW --> RT[路由器管理代理]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>两个域名共享入口] -.->|发送邮件| MAIL[自建邮件服务器<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 警报]\n            LOKI[Loki / Promtail<br/>日志收集]\n            JG[Jaeger<br/>分布式追踪]\n            VL[Velero<br/>PVC 备份]\n\n            PROM -.->|指标抓取| GW\n            LOKI -.->|所有命名空间| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO 保存至| MO[MinIO]\n        ",
-    "domainsplit": "\n            subgraph before[以前: leedohyun.com 单一域名]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[当前: 域名分离]\n                A1[leedohyun.com<br/>个人专用] --> A2[blog / redmine / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>商城专用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.迁移.-> after\n        ",
-    "improved": "\n            Internet[互联网] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[个人路由器]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>单一入口 - 已完成]\n            Traefik --> Istio[Istio 服务网格<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> RM[Redmine]\n            GW --> KC[Keycloak]\n            GW --> Shop[商城 - posselect.com]\n\n            GW --> Monitor[监控/日志栈<br/>Prometheus/Grafana/Loki - 已完成]\n            Monitor --> AlertManager[Alertmanager<br/>Email 已完成，计划支持Slack]\n\n            GW --> Observability[可观测性栈]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>4个Java后端已完成]\n\n            GW --> Storage[存储]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC 自动备份完成]\n        ",
+    "domainsplit": "\n            subgraph before[以前: leedohyun.com 单一域名]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[当前: 域名分离]\n                A1[leedohyun.com<br/>个人专用] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>商城专用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.迁移.-> after\n        ",
+    "improved": "\n            Internet[互联网] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[个人路由器]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>单一入口 - 已完成]\n            Traefik --> Istio[Istio 服务网格<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> KC[Keycloak]\n            GW --> Shop[商城 - posselect.com]\n\n            GW --> Monitor[监控/日志栈<br/>Prometheus/Grafana/Loki - 已完成]\n            Monitor --> AlertManager[Alertmanager<br/>Email 已完成，计划支持Slack]\n\n            GW --> Observability[可观测性栈]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>4个Java后端已完成]\n\n            GW --> Storage[存储]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC 自动备份完成]\n        ",
     "roadmap": "\n            subgraph now[\"现在 - 家庭服务器（过渡期）\"]\n                direction TB\n                MinIO2[MinIO<br/>shop/static, shop/image]\n                ImgProxy[imgproxy<br/>图像处理]\n            end\n\n            subgraph later[\"未来 - 云端迁移时\"]\n                direction TB\n                S3[S3 兼容存储<br/>使用相同的键结构迁移]\n                CDN2[CloudFront / Cloudflare<br/>单一 cdn.posselect.com + 路径路由]\n            end\n\n            subgraph newcap[\"新功能 - 云原生\"]\n                direction TB\n                Video[VOD<br/>Cloudflare Stream / Mux 等]\n                Live[直播<br/>AWS IVS / MediaConvert 等]\n            end\n\n            now -.->|\"保持名称/URL体系，仅替换后端\"| later\n        "
   }
 }

@@ -34,7 +34,9 @@
     "no_image": "No Image",
     "infra_desc": "Spring Cloud Gateway, Cluster Infrastructure, Monitoring/Log/Tracing/Backup, Mail Server, and CI/CD are shared between leedohyun.com and posselect.com. To avoid repeating these in each domain's diagram, they are separated into this tab.",
     "domain_split_title": "Domain Split: leedohyun.com (Personal) / posselect.com (Shop) separation (2026-08-02)",
-    "roadmap_title": "Long-term Roadmap — Assuming Cloud Transition and Large-scale Expansion (Confirmed 2026-08-06)"
+    "roadmap_title": "Long-term Roadmap — Assuming Cloud Transition and Large-scale Expansion (Confirmed 2026-08-06)",
+    "commercial_title": "Commercial Value and Architectural Premium",
+    "tab_commercial": "Commercial Value"
   },
   "data": {
     "current": {
@@ -55,14 +57,6 @@
             "domains": [
               "leedohyun.com",
               "blog.leedohyun.com"
-            ],
-            "status": "deployed"
-          },
-          {
-            "name": "Redmine",
-            "domains": [
-              "alm.leedohyun.com",
-              "redmine.leedohyun.com"
             ],
             "status": "deployed"
           },
@@ -197,8 +191,7 @@
           {
             "name": "MySQL",
             "services": [
-              "WordPress",
-              "Redmine"
+              "WordPress"
             ],
             "status": "deployed"
           },
@@ -318,7 +311,6 @@
       "leedohyun_com": [
         "leedohyun.com/www → Redirects to blog.leedohyun.com",
         "blog/wordpress",
-        "alm/redmine",
         "minio/static",
         "tool",
         "architecture",
@@ -456,10 +448,10 @@
   },
   "mermaid": {
     "posselect": "\n            Internet[Internet] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            IP -.->|design-assets Bucket| MO2[MinIO<br/>leedohyun.com Same instance as tab]\n            UI -.->|Signed URL| IP\n\n            GF -.->|Metric Scraping| GW\n            GF -.->|Metric Scraping| AA\n            GF -.->|Metric Scraping| PA\n            GF -.->|Metric Scraping| OA\n            GF -.->|Via Exporter| PG2\n            GF -.->|Via Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>Cart]\n        ",
-    "leedohyun": "\n            Internet[Internet] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> RM[Redmine<br/>alm / redmine]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>This page you are viewing]\n            GW --> RT[Router Admin Proxy]\n\n            WP --> MySQL1[MySQL]\n            RM --> MySQL1\n            WP --> Redis1[Redis]\n        ",
+    "leedohyun": "\n            Internet[Internet] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>This page you are viewing]\n            GW --> RT[Router Admin Proxy]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>Two domains Shared Entrypoint] -.->|Send mail| MAIL[Self-hosted Mail<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email Alert]\n            LOKI[Loki / Promtail<br/>Log Collection]\n            JG[Jaeger<br/>Distributed Tracing]\n            VL[Velero<br/>PVC Backup]\n\n            PROM -.->|Metric Scraping| GW\n            LOKI -.->|All Namespaces| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO saved to| MO[MinIO]\n        ",
-    "domainsplit": "\n            subgraph before[Before: leedohyun.com Single Domain]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[Current: Domain Split]\n                A1[leedohyun.com<br/>Personal Use] --> A2[blog / redmine / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>Shop Use] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.Transition.-> after\n        ",
-    "improved": "\n            Internet[Internet] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[Personal Router]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>Single Entrypoint - Completed]\n            Traefik --> Istio[Istio Service Mesh<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> RM[Redmine]\n            GW --> KC[Keycloak]\n            GW --> Shop[Shop - posselect.com]\n\n            GW --> Monitor[Monitor/Log Stack<br/>Prometheus/Grafana/Loki - Completed]\n            Monitor --> AlertManager[Alertmanager<br/>Email Completed, Slack planned]\n\n            GW --> Observability[Observability Stack]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>Java Backend 4 Completed]\n\n            GW --> Storage[Storage]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC Auto Backup Completed]\n        ",
+    "domainsplit": "\n            subgraph before[Before: leedohyun.com Single Domain]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[Current: Domain Split]\n                A1[leedohyun.com<br/>Personal Use] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>Shop Use] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.Transition.-> after\n        ",
+    "improved": "\n            Internet[Internet] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[Personal Router]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>Single Entrypoint - Completed]\n            Traefik --> Istio[Istio Service Mesh<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> KC[Keycloak]\n            GW --> Shop[Shop - posselect.com]\n\n            GW --> Monitor[Monitor/Log Stack<br/>Prometheus/Grafana/Loki - Completed]\n            Monitor --> AlertManager[Alertmanager<br/>Email Completed, Slack planned]\n\n            GW --> Observability[Observability Stack]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>Java Backend 4 Completed]\n\n            GW --> Storage[Storage]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC Auto Backup Completed]\n        ",
     "roadmap": "\n            subgraph now[\"Now - Home Server (Transitional)\"]\n                direction TB\n                MinIO2[MinIO<br/>shop/static, shop/image]\n                ImgProxy[imgproxy<br/>Image Processing]\n            end\n\n            subgraph later[\"Later - Cloud Transition\"]\n                direction TB\n                S3[S3 Compatible Storage<br/>Migrate with same key structure]\n                CDN2[CloudFront / Cloudflare<br/>Single cdn.posselect.com + Path Routing]\n            end\n\n            subgraph newcap[\"New Feature - Cloud Native\"]\n                direction TB\n                Video[VOD<br/>Cloudflare Stream / Mux, etc.]\n                Live[Live Streaming<br/>AWS IVS / MediaConvert, etc.]\n            end\n\n            now -.->|\"Keep Name/URL scheme, replace backend\"| later\n        "
   }
 }
