@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 dist/
+
+# Claude Code session worktrees (never track, see repo history for why)
+.claude/worktrees/
