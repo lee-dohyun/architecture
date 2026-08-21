@@ -2,5 +2,11 @@ __pycache__/
 *.pyc
 dist/
 
-# Claude Code session worktrees (never track, see repo history for why)
+# Claude Code session worktrees (gitlink으로 통째 커밋되는 사고 방지, ~/msa/AGENTS.md 참고)
 .claude/worktrees/
+
+# 2026-08-16 i18n 작업 중 셸 명령 사고로 루트에 생겼던 mermaid 노드명 형태의 0바이트 파일들
+# (`A2[blog`, `KC[Keycloak]`, `메일` 등 확장자 없는 빈 파일 60여 개) 재발 방지.
+# 이 저장소 루트에 정상적으로 존재하는 확장자 없는 파일은 없다.
+/*[[]*
+/*[]]*

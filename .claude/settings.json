@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 app.py*)",
+      "Bash(python3 build_static.py*)",
+      "Bash(python3 -m py_compile*)",
+      "Bash(python3 -m json.tool*)",
+      "Bash(pip install -r requirements.txt*)",
+      "Bash(pip list*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(kubectl get*)",
+      "Bash(kubectl logs*)",
+      "Bash(kubectl describe*)",
+      "Bash(kubectl rollout status*)",
+      "Bash(./.claude/hooks/check-i18n-keys.sh)",
+      "Bash(./.claude/hooks/check-mermaid.sh)"
+    ],
+    "deny": [
+      "Read(./**/.env*)",
+      "Read(./**/*deployer.kubeconfig)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "p=$(jq -r '.tool_input.file_path // empty'); case \"$p\" in */data/*.json) exec \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-i18n-keys.sh\" ;; esac"
+          },
+          {
+            "type": "command",
+            "command": "p=$(jq -r '.tool_input.file_path // empty'); case \"$p\" in */data/*.json) exec \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-mermaid.sh\" ;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}
