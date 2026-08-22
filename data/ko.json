@@ -83,7 +83,8 @@
               "architecture.leedohyun.com",
               "architecture.posselect.com"
             ],
-            "status": "deployed"
+            "status": "deployed",
+            "desc": "K3s 클러스터 아키텍처 시각화. ko/en/ja/zh 다국어 지원."
           },
           {
             "name": "라우터 관리화면 프록시",
@@ -99,7 +100,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료.",
+            "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료. 카테고리 8x26 / 상품 128 / 배너 8종 데모 카탈로그로 확장 완료(2026-08-21).",
             "status": "deployed"
           },
           {
@@ -296,21 +297,23 @@
         ]
       },
       "issues": [
-        "보안 강화 미적용 (RBAC 세분화, NetworkPolicy, Istio mTLS — 계획 문서만 존재)",
+        "동서(East-West) 트래픽 무방비 — NetworkPolicy 매니페스트는 작성됐으나 미적용, RBAC 세분화·Istio mTLS는 여전히 계획 문서만 존재",
         "분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
         "단일 장애점 (단일 노드 클러스터, 이중화 없음)",
         "Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",
         "자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음 (구조적 한계)",
         "architecture-web/tool/wordpress는 여전히 수동 배포",
         "customer.front 간편 로그인(카카오/네이버/구글) 구현 및 휴대폰 본인인증 백엔드 연동 필요",
-        "Velero 주기적(3개월 등) 복구 재검증 루틴 필요"
+        "Velero 주기적(3개월 등) 복구 재검증 루틴 필요",
+        "Velero 백업이 원본과 같은 단일 HDD에만 저장됨 — 오프사이트 사본 없음(목적지/자격증명은 별도 준비 중)",
+        "레이트리밋은 posselect.com Ingress에만 적용, leedohyun.com은 미적용 — 서킷브레이커는 코드에 없음"
       ]
     },
     "domain_split": {
       "title": "도메인 재구성: leedohyun.com(개인) / posselect.com(쇼핑몰) 분리 (2026-08-02)",
       "summary": "leedohyun.com(개인)과 posselect.com(쇼핑몰) 도메인 분리 완료. K3s 인프라는 공유하되, 인증/라우팅/DNS 계층은 독립적으로 운영.",
       "leedohyun_com": [
-        "leedohyun.com/www → blog.leedohyun.com 리다이렉트",
+        "leedohyun.com/www → architecture.leedohyun.com 리다이렉트 (2026-08-12 변경)",
         "blog/wordpress",
         "minio/static",
         "tool",
@@ -319,7 +322,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "posselect.com/www → home.posselect.com 리다이렉트",
+        "posselect.com → www.posselect.com 리다이렉트 (home.posselect.com과 동일 콘텐츠 직접 서빙)",
         "home",
         "customer",
         "product",
@@ -342,7 +345,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (단일 노드, control-plane 겸 worker)"
     },
-    "updated_at": "2026-08-15",
+    "updated_at": "2026-08-22",
     "improved": [
       {
         "name": "Spring Cloud Gateway 단일 진입점",
@@ -399,6 +402,30 @@
         ],
         "status": "planned",
         "status_text": "계획됨"
+      },
+      {
+        "name": "공급망 보안 (Dependabot + Trivy 이미지 스캔)",
+        "domains": [
+          "의존성 자동 업데이트 PR + 컨테이너 이미지 취약점 스캔 전 저장소 롤아웃 완료"
+        ],
+        "status": "deployed",
+        "status_text": "완료됨(11개 저장소)"
+      },
+      {
+        "name": "architecture-web 다국어 지원 (ko/en/ja/zh)",
+        "domains": [
+          "URL 경로 기반 다국어 라우팅 + mermaid 다이어그램 6종 번역 완료"
+        ],
+        "status": "deployed",
+        "status_text": "완료됨"
+      },
+      {
+        "name": "재고 차감 멱등성 / 환불 시 재고 복원",
+        "domains": [
+          "product.api 재고 차감 멱등성 처리(별도 bean 분리 + Testcontainers 검증) 및 환불 재고 복원 API 적용 완료"
+        ],
+        "status": "deployed",
+        "status_text": "완료됨"
       }
     ],
     "roadmap": {

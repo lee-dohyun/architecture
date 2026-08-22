@@ -82,7 +82,8 @@
               "architecture.leedohyun.com",
               "architecture.posselect.com"
             ],
-            "status": "deployed"
+            "status": "deployed",
+            "desc": "K3sクラスターアーキテクチャの可視化。ko/en/ja/zh 多言語対応。"
           },
           {
             "name": "ルーター管理画面プロキシ",
@@ -98,7 +99,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "ショッピングモールのメインランディングページ（Next.js）。メインページの領域別商品情報およびバナーAPI連動完了。",
+            "desc": "ショッピングモールのメインランディングページ（Next.js）。メインページの領域別商品情報およびバナーAPI連動完了。 カテゴリ8x26 / 商品128 / バナー8種のデモカタログへ拡張完了（2026-08-21）。",
             "status": "deployed"
           },
           {
@@ -295,21 +296,23 @@
         ]
       },
       "issues": [
-        "セキュリティ強化未適用（RBACの細分化、NetworkPolicy、Istio mTLS — 計画書のみ存在）",
+        "東西（East-West）トラフィックが無防備 — NetworkPolicy のマニフェストは作成済みだが未適用。RBAC の細分化・Istio mTLS は依然として計画書のみ",
         "分散トレーシングはJavaバックエンド4つのみ計測（Next.jsフロントエンドは未計測）、Kiali/サービスメッシュの可観測性は依然としてなし",
         "単一障害点（単一ノードクラスター、冗長化なし）",
         "AlertmanagerはEmailのみ連携、Slackなどの追加チャンネルは未連携",
         "自前メールサーバーが家庭用動的IP+PTR未設定のため、スパムフォルダに到達する可能性あり（構造的限界）",
         "architecture-web/tool/wordpressは依然として手動デプロイ",
         "customer.frontのソーシャルログイン（Kakao/Naver/Google）実装および携帯電話の本人認証バックエンド連携が必要",
-        "Veleroの定期的（3ヶ月など）な復元再検証ルーチンが必要"
+        "Veleroの定期的（3ヶ月など）な復元再検証ルーチンが必要",
+        "Velero バックアップは原本と同じ単一HDDにのみ保存 — オフサイトコピーは未整備（保存先・認証情報は別途準備中）",
+        "レートリミットは posselect.com の Ingress のみ適用、leedohyun.com は未適用 — サーキットブレーカーはコードに存在しない"
       ]
     },
     "domain_split": {
       "title": "ドメイン再構成：leedohyun.com（個人）/ posselect.com（ショップ）分離 (2026-08-02)",
       "summary": "leedohyun.com（個人）とposselect.com（ショッピングモール）のドメイン分離完了。K3sインフラは共有しつつ、認証/ルーティング/DNSレイヤーは独立して運営。",
       "leedohyun_com": [
-        "leedohyun.com/www → blog.leedohyun.com にリダイレクト",
+        "leedohyun.com/www → architecture.leedohyun.com へリダイレクト（2026-08-12変更）",
         "blog/wordpress",
         "minio/static",
         "tool",
@@ -318,7 +321,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "posselect.com/www → home.posselect.com にリダイレクト",
+        "posselect.com → www.posselect.com へリダイレクト（home.posselect.com と同じコンテンツを直接配信）",
         "home",
         "customer",
         "product",
@@ -341,7 +344,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (単一ノード、control-plane兼worker)"
     },
-    "updated_at": "2026-08-15",
+    "updated_at": "2026-08-22",
     "improved": [
       {
         "name": "Spring Cloud Gateway 単一エントリポイント",
@@ -398,6 +401,30 @@
         ],
         "status": "planned",
         "status_text": "計画中"
+      },
+      {
+        "name": "サプライチェーンセキュリティ（Dependabot + Trivy イメージスキャン）",
+        "domains": [
+          "依存関係自動更新PR + コンテナイメージ脆弱性スキャンを全リポジトリに展開完了"
+        ],
+        "status": "deployed",
+        "status_text": "完了（11リポジトリ）"
+      },
+      {
+        "name": "architecture-web 多言語対応（ko/en/ja/zh）",
+        "domains": [
+          "URLパスベースの多言語ルーティング + mermaid ダイアグラム6種の翻訳完了"
+        ],
+        "status": "deployed",
+        "status_text": "完了"
+      },
+      {
+        "name": "在庫差引の冪等性 / 返金時の在庫復元",
+        "domains": [
+          "product.api の在庫差引冪等性処理（別Bean分離 + Testcontainers検証）と返金時在庫復元APIを適用完了"
+        ],
+        "status": "deployed",
+        "status_text": "完了"
       }
     ],
     "roadmap": {

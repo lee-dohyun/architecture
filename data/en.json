@@ -82,7 +82,8 @@
               "architecture.leedohyun.com",
               "architecture.posselect.com"
             ],
-            "status": "deployed"
+            "status": "deployed",
+            "desc": "K3s cluster architecture visualization. Supports ko/en/ja/zh."
           },
           {
             "name": "Router Admin Proxy",
@@ -98,7 +99,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "Shopping mall main landing page (Next.js). Product info and banner API integration completed for main page sections.",
+            "desc": "Shopping mall main landing page (Next.js). Product info and banner API integration completed for main page sections. Expanded to a demo catalog of 8x26 categories / 128 products / 8 banners (completed 2026-08-21).",
             "status": "deployed"
           },
           {
@@ -295,21 +296,23 @@
         ]
       },
       "issues": [
-        "Security hardening not applied (RBAC granularity, NetworkPolicy, Istio mTLS — planned only)",
+        "East-West traffic is unprotected — NetworkPolicy manifests are written but not yet applied; RBAC granularity and Istio mTLS remain planning-only",
         "Distributed tracing only measures 4 Java backends (Next.js frontends not measured), no Kiali/Service Mesh observability yet",
         "Single point of failure (Single node cluster, no redundancy)",
         "Alertmanager only integrated with Email, additional channels like Slack not integrated",
         "Self-hosted mail server uses home dynamic IP+no PTR, potential spam folder delivery (Structural limit)",
         "architecture-web/tool/wordpress are still deployed manually",
         "customer.front needs social login (Kakao/Naver/Google) and phone verification backend integration",
-        "Velero needs periodic (e.g. 3 months) recovery validation routine"
+        "Velero needs periodic (e.g. 3 months) recovery validation routine",
+        "Velero backups live on the same single HDD as the source data — no offsite copy yet (destination/credentials being prepared separately)",
+        "Rate limiting is applied only to the posselect.com Ingress (not leedohyun.com) — circuit breaker is not implemented at all"
       ]
     },
     "domain_split": {
       "title": "Domain Restructuring: Separation of leedohyun.com (Personal) / posselect.com (Shop) (2026-08-02)",
       "summary": "Completed domain separation between leedohyun.com (Personal) and posselect.com (Shopping mall). K3s infrastructure is shared, but Auth/Routing/DNS layers are operated independently.",
       "leedohyun_com": [
-        "leedohyun.com/www → Redirects to blog.leedohyun.com",
+        "leedohyun.com/www → Redirects to architecture.leedohyun.com (changed 2026-08-12)",
         "blog/wordpress",
         "minio/static",
         "tool",
@@ -318,7 +321,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "posselect.com/www → Redirects to home.posselect.com",
+        "posselect.com → Redirects to www.posselect.com (served directly with the same content as home.posselect.com)",
         "home",
         "customer",
         "product",
@@ -341,7 +344,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (Single node, control-plane + worker)"
     },
-    "updated_at": "2026-08-15",
+    "updated_at": "2026-08-22",
     "improved": [
       {
         "name": "Spring Cloud Gateway Single Entry Point",
@@ -398,6 +401,30 @@
         ],
         "status": "planned",
         "status_text": "Planned"
+      },
+      {
+        "name": "Supply Chain Security (Dependabot + Trivy Image Scan)",
+        "domains": [
+          "Automated dependency update PRs + container image vulnerability scanning rolled out across all repositories"
+        ],
+        "status": "deployed",
+        "status_text": "Completed (11 repos)"
+      },
+      {
+        "name": "architecture-web Multilingual Support (ko/en/ja/zh)",
+        "domains": [
+          "URL path-based i18n routing + all 6 mermaid diagrams translated"
+        ],
+        "status": "deployed",
+        "status_text": "Completed"
+      },
+      {
+        "name": "Inventory Deduction Idempotency / Restock on Refund",
+        "domains": [
+          "product.api inventory deduction idempotency (separate bean + Testcontainers verification) and refund restock API applied"
+        ],
+        "status": "deployed",
+        "status_text": "Completed"
       }
     ],
     "roadmap": {

@@ -82,7 +82,8 @@
               "architecture.leedohyun.com",
               "architecture.posselect.com"
             ],
-            "status": "deployed"
+            "status": "deployed",
+            "desc": "K3s 集群架构可视化。支持 ko/en/ja/zh 多语言。"
           },
           {
             "name": "路由器管理界面代理",
@@ -98,7 +99,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。",
+            "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。 已扩展为 8x26 分类 / 128 件商品 / 8 个横幅的演示目录（2026-08-21 完成）。",
             "status": "deployed"
           },
           {
@@ -295,21 +296,23 @@
         ]
       },
       "issues": [
-        "未应用安全加固（RBAC细分、NetworkPolicy、Istio mTLS — 仅存在计划文档）",
+        "东西向（East-West）流量无防护 — NetworkPolicy 清单已编写但尚未应用，RBAC 细分和 Istio mTLS 仍停留在计划阶段",
         "分布式追踪仅测量了4个Java后端（Next.js前端未测量），Kiali/服务网格可观测性仍然缺失",
         "单点故障（单节点集群，无冗余）",
         "Alertmanager仅集成了Email，Slack等额外频道尚未集成",
         "自建邮件服务器因家庭动态IP+无PTR设置，存在进入垃圾邮件箱的可能性（结构性限制）",
         "architecture-web/tool/wordpress仍然手动部署",
         "customer.front需要实现社交登录（Kakao/Naver/Google）及手机身份验证后端对接",
-        "Velero需要定期（如3个月）的恢复重新验证例程"
+        "Velero需要定期（如3个月）的恢复重新验证例程",
+        "Velero 备份仅存放在与原始数据相同的单个硬盘上 — 尚无异地副本（存储目的地与凭证正在另行准备）",
+        "限流仅应用于 posselect.com 的 Ingress，leedohyun.com 尚未应用 — 断路器完全未在代码中实现"
       ]
     },
     "domain_split": {
       "title": "域名重构：leedohyun.com（个人）/ posselect.com（商城）分离 (2026-08-02)",
       "summary": "已完成leedohyun.com（个人）和posselect.com（商城）的域名分离。K3s基础设施共享，但认证/路由/DNS层独立运营。",
       "leedohyun_com": [
-        "leedohyun.com/www → 重定向至 blog.leedohyun.com",
+        "leedohyun.com/www → 重定向至 architecture.leedohyun.com（2026-08-12 变更）",
         "blog/wordpress",
         "minio/static",
         "tool",
@@ -318,7 +321,7 @@
         "monitoring"
       ],
       "posselect_com": [
-        "posselect.com/www → 重定向至 home.posselect.com",
+        "posselect.com → 重定向至 www.posselect.com（与 home.posselect.com 直接提供相同内容）",
         "home",
         "customer",
         "product",
@@ -341,7 +344,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (单节点，control-plane兼worker)"
     },
-    "updated_at": "2026-08-15",
+    "updated_at": "2026-08-22",
     "improved": [
       {
         "name": "Spring Cloud Gateway 单一入口点",
@@ -398,6 +401,30 @@
         ],
         "status": "planned",
         "status_text": "计划中"
+      },
+      {
+        "name": "供应链安全（Dependabot + Trivy 镜像扫描）",
+        "domains": [
+          "依赖自动更新 PR + 容器镜像漏洞扫描已在全部仓库完成推广"
+        ],
+        "status": "deployed",
+        "status_text": "已完成（11 个仓库）"
+      },
+      {
+        "name": "architecture-web 多语言支持（ko/en/ja/zh）",
+        "domains": [
+          "基于 URL 路径的多语言路由 + 6 种 mermaid 图表全部翻译完成"
+        ],
+        "status": "deployed",
+        "status_text": "已完成"
+      },
+      {
+        "name": "库存扣减幂等性 / 退款时库存恢复",
+        "domains": [
+          "product.api 库存扣减幂等性处理（独立 bean 分离 + Testcontainers 验证）及退款库存恢复 API 已应用完成"
+        ],
+        "status": "deployed",
+        "status_text": "已完成"
       }
     ],
     "roadmap": {
