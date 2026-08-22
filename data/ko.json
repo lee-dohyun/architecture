@@ -297,7 +297,7 @@
         ]
       },
       "issues": [
-        "동서(East-West) 트래픽 무방비 — NetworkPolicy 매니페스트는 작성됐으나 미적용, RBAC 세분화·Istio mTLS는 여전히 계획 문서만 존재",
+        "RBAC 세분화는 여전히 미적용. NetworkPolicy는 customer 네임스페이스(쇼핑몰)에만 default-deny-ingress+allow 규칙 적용 중(2026-08-17~), default 네임스페이스(개인 서비스)는 미적용. Istio/서비스 메시는 이 규모에 맞지 않는다고 판단해 의도적으로 도입하지 않음(대안: 게이트웨이 단일 진입점)",
         "분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
         "단일 장애점 (단일 노드 클러스터, 이중화 없음)",
         "Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",

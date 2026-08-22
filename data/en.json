@@ -296,7 +296,7 @@
         ]
       },
       "issues": [
-        "East-West traffic is unprotected — NetworkPolicy manifests are written but not yet applied; RBAC granularity and Istio mTLS remain planning-only",
+        "RBAC granularity is still not applied. NetworkPolicy (default-deny-ingress + allow rules) is applied only in the customer namespace (shop, since 2026-08-17) — the default namespace (personal services) has none. Istio/service mesh was deliberately not adopted as overkill for this scale (alternative: single gateway entry point)",
         "Distributed tracing only measures 4 Java backends (Next.js frontends not measured), no Kiali/Service Mesh observability yet",
         "Single point of failure (Single node cluster, no redundancy)",
         "Alertmanager only integrated with Email, additional channels like Slack not integrated",

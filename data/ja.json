@@ -296,7 +296,7 @@
         ]
       },
       "issues": [
-        "東西（East-West）トラフィックが無防備 — NetworkPolicy のマニフェストは作成済みだが未適用。RBAC の細分化・Istio mTLS は依然として計画書のみ",
+        "RBAC の細分化はまだ未適用。NetworkPolicy（default-deny-ingress + allow ルール）は customer ネームスペース（ショップ、2026-08-17〜）にのみ適用され、default ネームスペース（個人サービス）は未適用。Istio/サービスメッシュはこの規模には過剰と判断し意図的に導入しなかった（代替: ゲートウェイ単一エントリポイント）",
         "分散トレーシングはJavaバックエンド4つのみ計測（Next.jsフロントエンドは未計測）、Kiali/サービスメッシュの可観測性は依然としてなし",
         "単一障害点（単一ノードクラスター、冗長化なし）",
         "AlertmanagerはEmailのみ連携、Slackなどの追加チャンネルは未連携",

@@ -296,7 +296,7 @@
         ]
       },
       "issues": [
-        "东西向（East-West）流量无防护 — NetworkPolicy 清单已编写但尚未应用，RBAC 细分和 Istio mTLS 仍停留在计划阶段",
+        "RBAC 细分仍未应用。NetworkPolicy（default-deny-ingress + allow 规则）仅在 customer 命名空间（商城，自 2026-08-17 起）应用，default 命名空间（个人服务）未应用。判断 Istio/服务网格在此规模下属于过度设计，故意未引入（替代方案：网关单一入口）",
         "分布式追踪仅测量了4个Java后端（Next.js前端未测量），Kiali/服务网格可观测性仍然缺失",
         "单点故障（单节点集群，无冗余）",
         "Alertmanager仅集成了Email，Slack等额外频道尚未集成",
