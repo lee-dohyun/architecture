@@ -175,6 +175,14 @@
             ],
             "desc": "共通ヘッダー/フッターおよびカテゴリのランタイムシェル（静的配信）。",
             "status": "deployed"
+          },
+          {
+            "name": "tool.front",
+            "domains": [
+              "tool.posselect.com"
+            ],
+            "desc": "PosSelect 開発者ツール集。ツール・コンソール・ドキュメントへのリンク集とQRコード生成器（クライアントサイド）。ビルド不要の静的サイト。",
+            "status": "deployed"
           }
         ],
         "mail": [

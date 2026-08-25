@@ -175,6 +175,14 @@
             ],
             "desc": "公共页眉/页脚和分类抽屉的运行时Shell（静态服务）。",
             "status": "deployed"
+          },
+          {
+            "name": "tool.front",
+            "domains": [
+              "tool.posselect.com"
+            ],
+            "desc": "PosSelect 开发者工具集。工具·控制台·文档链接索引与二维码生成器（客户端）。无构建步骤的静态站点。",
+            "status": "deployed"
           }
         ],
         "mail": [

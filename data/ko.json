@@ -176,6 +176,14 @@
             ],
             "desc": "공통 헤더/푸터 및 카테고리 런타임 셸 (정적 서빙).",
             "status": "deployed"
+          },
+          {
+            "name": "tool.front",
+            "domains": [
+              "tool.posselect.com"
+            ],
+            "desc": "PosSelect 개발자 도구 모음. 도구·콘솔·문서 링크 인덱스와 QR 코드 생성기(클라이언트 사이드). 빌드 스텝 없는 정적 사이트.",
+            "status": "deployed"
           }
         ],
         "mail": [

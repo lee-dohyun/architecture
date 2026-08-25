@@ -175,6 +175,14 @@
             ],
             "desc": "Runtime shell for common header/footer and category drawer (static serving).",
             "status": "deployed"
+          },
+          {
+            "name": "tool.front",
+            "domains": [
+              "tool.posselect.com"
+            ],
+            "desc": "PosSelect developer tools index. Card grid of links to tools/consoles/docs plus a client-side QR code generator. Static site, no build step.",
+            "status": "deployed"
           }
         ],
         "mail": [
