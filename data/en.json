@@ -119,6 +119,14 @@
             "status": "deployed"
           },
           {
+            "name": "RAG Product Q&A (product-api)",
+            "domains": [
+              "POST /api/products/qa (product.posselect.com)"
+            ],
+            "desc": "A natural-language question is narrowed to the top 5 products by pgvector embedding similarity (text-embedding-3-small, 1536 dims), then an LLM (gpt-4o-mini) answers grounded only on that list. Embeddings are rebuilt by the /internal/embeddings/reindex batch (no gateway route = unreachable from outside). The code is deployed; returning 503 until the OPENAI_API_KEY secret is registered is the designed behavior.",
+            "status": "deployed"
+          },
+          {
             "name": "order-api",
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
@@ -212,7 +220,7 @@
             "status": "deployed"
           },
           {
-            "name": "PostgreSQL (catalog-postgres, orders-postgres)",
+            "name": "PostgreSQL (catalog-postgres + pgvector, orders-postgres)",
             "services": [
               "product-api",
               "order-api"
@@ -313,7 +321,8 @@
         "customer.front needs social login (Kakao/Naver/Google) and phone verification backend integration",
         "Velero needs periodic (e.g. 3 months) recovery validation routine",
         "Velero backups live on the same single HDD as the source data — no offsite copy yet (destination/credentials being prepared separately)",
-        "Rate limiting is applied only to the posselect.com Ingress (not leedohyun.com) — circuit breaker is not implemented at all"
+        "Rate limiting is applied only to the posselect.com Ingress (not leedohyun.com) — circuit breaker is not implemented at all",
+        "RAG Product Q&A is fully deployed (code, schema, UI) but pinned to 503 because the OPENAI_API_KEY secret is not registered — registering the key is the only remaining activation step (product.api#60)"
       ]
     },
     "domain_split": {
@@ -352,7 +361,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (Single node, control-plane + worker)"
     },
-    "updated_at": "2026-08-22",
+    "updated_at": "2026-08-28",
     "improved": [
       {
         "name": "Spring Cloud Gateway Single Entry Point",
@@ -433,6 +442,14 @@
         ],
         "status": "deployed",
         "status_text": "Completed"
+      },
+      {
+        "name": "RAG Product Q&A (pgvector + LLM)",
+        "domains": [
+          "Natural-language query → embedding similarity search → LLM answer pipeline deployed on both backend and frontend. Activates once OPENAI_API_KEY is registered"
+        ],
+        "status": "deployed",
+        "status_text": "Completed (awaiting key)"
       }
     ],
     "roadmap": {
@@ -482,7 +499,7 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[Internet] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            IP -.->|design-assets Bucket| MO2[MinIO<br/>leedohyun.com Same instance as tab]\n            UI -.->|Signed URL| IP\n\n            GF -.->|Metric Scraping| GW\n            GF -.->|Metric Scraping| AA\n            GF -.->|Metric Scraping| PA\n            GF -.->|Metric Scraping| OA\n            GF -.->|Via Exporter| PG2\n            GF -.->|Via Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>Cart]\n        ",
+    "posselect": "\n            Internet[Internet] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|Product QA| PA\n            PA -.->|Embedding & Answer Gen| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets Bucket| MO2[MinIO<br/>leedohyun.com Same instance as tab]\n            UI -.->|Signed URL| IP\n\n            GF -.->|Metric Scraping| GW\n            GF -.->|Metric Scraping| AA\n            GF -.->|Metric Scraping| PA\n            GF -.->|Metric Scraping| OA\n            GF -.->|Via Exporter| PG2\n            GF -.->|Via Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>Cart]\n        ",
     "leedohyun": "\n            Internet[Internet] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>This page you are viewing]\n            GW --> RT[Router Admin Proxy]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>Two domains Shared Entrypoint] -.->|Send mail| MAIL[Self-hosted Mail<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email Alert]\n            LOKI[Loki / Promtail<br/>Log Collection]\n            JG[Jaeger<br/>Distributed Tracing]\n            VL[Velero<br/>PVC Backup]\n\n            PROM -.->|Metric Scraping| GW\n            LOKI -.->|All Namespaces| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO saved to| MO[MinIO]\n        ",
     "domainsplit": "\n            subgraph before[Before: leedohyun.com Single Domain]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[Current: Domain Split]\n                A1[leedohyun.com<br/>Personal Use] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>Shop Use] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.Transition.-> after\n        ",
