@@ -71,8 +71,14 @@ repo doesn't yet have).
 - **`.claude/hooks/check-mermaid.sh`** — bracket-pair integrity of every `mermaid` block, plus two things
   that are easy to get wrong: a `graph TB`-style directive leaking into the data, and a block the template
   never references.
-- Both run automatically as `PostToolUse` hooks after any `data/*.json` edit (see `.claude/settings.json`),
-  and both work standalone. Run them before pushing — CI does not.
+- **`scripts/verify.d/check-issue-indices.sh`** — `templates/index.html` pulls `data.current.issues` out
+  **by hardcoded index** (`issues[0]`…`issues[N]`) because each issue belongs to a different tab, so an item
+  appended to the JSON renders nowhere and nothing complains. `check-i18n-keys.sh` only compares list
+  *lengths* across languages, so it cannot see this. `issues[8]` and `issues[9]` had been invisible on the
+  live site this way (found 2026-08-28). This runs from `scripts/verify.sh` (pre-push + CI).
+- Both hooks run automatically as `PostToolUse` hooks after any `data/*.json` edit (see
+  `.claude/settings.json`), and all three work standalone. Run them before pushing — CI runs only
+  `verify.sh`.
 
 ## Related
 
