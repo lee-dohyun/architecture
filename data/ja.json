@@ -139,7 +139,23 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "管理者バックオフィス。Keycloak（staffレルム）ログイン。",
+            "desc": "管理者バックオフィス。Keycloak(staff realm)ログイン。商品管理(状態・販売者フィルター、販売ポリシー編集)、パートナー商品の審査キュー、販売者の出店審査とパートナーアカウント発行(partner realm サービスアカウント)。",
+            "status": "deployed"
+          },
+          {
+            "name": "partner.front(パートナーセンター)",
+            "domains": [
+              "partner.posselect.com"
+            ],
+            "desc": "外部販売者(パートナー)が商品を自ら登録するポータル(Next.js BFF)。partner realm ログイン → カテゴリ別の商品情報提供告示、オプション組み合わせの自動生成、販売ポリシー(課税・配送/返品・販売期間・購入数量)入力 → 審査提出 → 修正依頼を各入力欄の横に表示。セルフ登録なし — 出店承認後に社員がアカウントを発行。",
+            "status": "deployed"
+          },
+          {
+            "name": "パートナー API(product-api)",
+            "domains": [
+              "/api/partner/**(partner.front サーバーがクラスター内部から呼び出し)"
+            ],
+            "desc": "partner realm の JWT を product-api 自身が再検証(issuer + azp=partner-front)し、トークンの seller_id でデータ範囲を強制する(他社の商品は 404)。パートナー商品は常に非公開(DRAFT)で作成され、自動ルール検証(告示・販売ポリシー・禁止語)→ 社員審査 → 承認時のみショップに公開。公開閲覧・カート・注文確定は販売中(LIVE)かつ販売期間内の商品のみ許可。",
             "status": "deployed"
           },
           {
@@ -147,7 +163,7 @@
             "domains": [
               "keycloak.posselect.com"
             ],
-            "desc": "ショッピングモール専用SSO/OAuth2・OIDC認証サーバー。",
+            "desc": "ショップ専用の SSO/OAuth2・OIDC 認証サーバー。realm は3つ: customer(顧客)/ staff(社員、ロール PRODUCT_MANAGER・ORDER_MANAGER・PARTNER・SYSTEM_ADMIN)/ partner(外部販売者、トークンに seller_id クレーム)。",
             "status": "deployed"
           },
           {
@@ -322,7 +338,9 @@
         "Veleroの定期的（3ヶ月など）な復元再検証ルーチンが必要",
         "Velero バックアップは原本と同じ単一HDDにのみ保存 — オフサイトコピーは未整備（保存先・認証情報は別途準備中）",
         "レートリミットは posselect.com の Ingress のみ適用、leedohyun.com は未適用 — サーキットブレーカーはコードに存在しない",
-        "RAG 商品Q&A はコード・スキーマ・UI いずれもデプロイ済みだが、OPENAI_API_KEY シークレットが未登録のため呼び出し時 503 で固定 — キー登録が唯一の有効化条件(product.api#60)"
+        "RAG 商品Q&A はコード・スキーマ・UI いずれもデプロイ済みだが、OPENAI_API_KEY シークレットが未登録のため呼び出し時 503 で固定 — キー登録が唯一の有効化条件(product.api#60)",
+        "販売者を停止・解約しても、その販売者の販売中商品はショップで引き続き販売される — 対応方針の決定待ち(product.api#100)",
+        "自社(1P)商品 129件に販売ポリシー(配送・返品条件)が未入力のため、商品詳細に配送・交換・返品案内が表示されない — 実際の条件確定待ち。販売者情報セクションも事業者登録前のため非表示(product.front#38)"
       ]
     },
     "domain_split": {
@@ -361,7 +379,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (単一ノード、control-plane兼worker)"
     },
-    "updated_at": "2026-08-28",
+    "updated_at": "2026-09-29",
     "improved": [
       {
         "name": "Spring Cloud Gateway 単一エントリポイント",
@@ -450,6 +468,14 @@
         ],
         "status": "deployed",
         "status_text": "完了(キー登録待ち)"
+      },
+      {
+        "name": "パートナーポータル — 出店審査・商品登録・審査",
+        "domains": [
+          "外部販売者が partner.posselect.com で商品を登録し、ルール検証と社員審査を経て販売されるまでの全フローを公開(出店審査・アカウント発行・審査キュー・販売ポリシー・購入制限を含む)"
+        ],
+        "status": "deployed",
+        "status_text": "完了"
       }
     ],
     "roadmap": {
@@ -499,7 +525,7 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[インターネット] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|商品QA| PA\n            PA -.->|埋め込み・回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets バケット| MO2[MinIO<br/>leedohyun.com タブと同じインスタンス]\n            UI -.->|署名付きURL| IP\n\n            GF -.->|メトリクススクレイピング| GW\n            GF -.->|メトリクススクレイピング| AA\n            GF -.->|メトリクススクレイピング| PA\n            GF -.->|メトリクススクレイピング| OA\n            GF -.->|エクスポーター経由| PG2\n            GF -.->|エクスポーター経由| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>カート]\n        ",
+    "posselect": "\n            Internet[インターネット] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|パートナーアカウント発行| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|パートナー API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|商品QA| PA\n            PA -.->|埋め込み・回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets バケット| MO2[MinIO<br/>leedohyun.com タブと同じインスタンス]\n            UI -.->|署名付きURL| IP\n\n            GF -.->|メトリクススクレイピング| GW\n            GF -.->|メトリクススクレイピング| AA\n            GF -.->|メトリクススクレイピング| PA\n            GF -.->|メトリクススクレイピング| OA\n            GF -.->|エクスポーター経由| PG2\n            GF -.->|エクスポーター経由| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>カート]\n        ",
     "leedohyun": "\n            Internet[インターネット] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>現在ご覧のページ]\n            GW --> RT[ルーター管理プロキシ]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>両ドメイン共有エントリポイント] -.->|メール送信| MAIL[自前メールサーバー<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 通知]\n            LOKI[Loki / Promtail<br/>ログ収集]\n            JG[Jaeger<br/>分散トレーシング]\n            VL[Velero<br/>PVC バックアップ]\n\n            PROM -.->|メトリクススクレイピング| GW\n            LOKI -.->|全ネームスペース| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO に保存| MO[MinIO]\n        ",
     "domainsplit": "\n            subgraph before[以前: leedohyun.com 単一ドメイン]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[現在: ドメイン分離]\n                A1[leedohyun.com<br/>個人専用] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>ショップ専用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.移行.-> after\n        ",
