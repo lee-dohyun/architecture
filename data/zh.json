@@ -250,7 +250,8 @@
           {
             "name": "Redis (customer ns)",
             "services": [
-              "product-api 购物车"
+              "product-api 购物车",
+              "网关限流计数器"
             ],
             "status": "deployed"
           }
@@ -325,7 +326,7 @@
         "社交登录仅 Google 可用 — Kakao（仅在 Keycloak 注册了 IdP）和 Naver 按钮在登录页为禁用状态",
         "Velero需要定期（如3个月）的恢复重新验证例程",
         "Velero 备份仅存放在与原始数据相同的单个硬盘上 — 尚无异地副本（存储目的地与凭证正在另行准备）",
-        "限流仅存在于 posselect.com 一侧（Ingress 中间件 + 网关的 6 条 API 路由），leedohyun.com 未启用。其中网关侧因 Redis 连接问题目前并未生效（gateway#308）。熔断器应用于同样的 6 条 API 路由",
+        "限流仅存在于 posselect.com 一侧（Ingress 中间件 + 网关的 6 条 API 路由），leedohyun.com 未启用。熔断器应用于同样的 6 条 API 路由",
         "RAG 商品问答的代码、schema 与 UI 均已部署，但因未注册 OPENAI_API_KEY 密钥而固定返回 503 — 注册密钥是唯一的启用条件(product.api#60)",
         "首页「最近浏览」区域尚未实现 — 浏览记录保存在按站点（origin）隔离的浏览器存储中，home 无法读取在 product.posselect.com 浏览的商品。存储方式待定，限时特卖也未开始（store.front#37）",
         "131 件自营(1P)商品中有 130 件尚未填写销售政策(配送·退货条件),商品详情页不显示配送·换货·退货说明 — 等待实际条件确定;卖家信息区块也因尚未办理营业登记而隐藏(product.front#38)"
@@ -367,7 +368,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (单节点，control-plane兼worker)"
     },
-    "updated_at": "2026-10-02",
+    "updated_at": "2026-10-03",
     "improved": [
       {
         "name": "Spring Cloud Gateway 单一入口点",
@@ -545,7 +546,7 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[互联网] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|发放合作商账号| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|合作商 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|商品、横幅、收藏| PA\n            OA -.->|会员等级、折扣率| AA\n            AA -.->|确认购买金额| OA\n            PF -.->|商品问答| PA\n            PA -.->|嵌入与回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 存储桶| MO2[MinIO<br/>leedohyun.com 与标签页相同实例]\n            UI -.->|签名URL| IP\n\n            GF -.->|指标抓取| GW\n            GF -.->|指标抓取| AA\n            GF -.->|指标抓取| PA\n            GF -.->|指标抓取| OA\n            GF -.->|通过Exporter| PG2\n            GF -.->|通过Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 会员、等级]\n            PA --> Redis2[Redis<br/>购物车]\n        ",
+    "posselect": "\n            Internet[互联网] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|发放合作商账号| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|合作商 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|商品、横幅、收藏| PA\n            OA -.->|会员等级、折扣率| AA\n            AA -.->|确认购买金额| OA\n            PF -.->|商品问答| PA\n            PA -.->|嵌入与回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 存储桶| MO2[MinIO<br/>leedohyun.com 与标签页相同实例]\n            UI -.->|签名URL| IP\n\n            GF -.->|指标抓取| GW\n            GF -.->|指标抓取| AA\n            GF -.->|指标抓取| PA\n            GF -.->|指标抓取| OA\n            GF -.->|通过Exporter| PG2\n            GF -.->|通过Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 会员、等级]\n            PA --> Redis2[Redis<br/>购物车]\n            GW -.->|限流计数器| Redis2\n        ",
     "leedohyun": "\n            Internet[互联网] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>您当前正在查看的页面]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>两个域名共享入口] -.->|发送邮件| MAIL[自建邮件服务器<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 警报]\n            LOKI[Loki / Promtail<br/>日志收集]\n            JG[Jaeger<br/>分布式追踪]\n            VL[Velero<br/>PVC 备份]\n\n            PROM -.->|指标抓取| GW\n            LOKI -.->|所有命名空间| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO 保存至| MO[MinIO]\n        ",
     "domainsplit": "\n            subgraph before[以前: leedohyun.com 单一域名]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[当前: 域名分离]\n                A1[leedohyun.com<br/>个人专用] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>商城专用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.迁移.-> after\n        ",

@@ -250,7 +250,8 @@
           {
             "name": "Redis (customer ns)",
             "services": [
-              "product-api カート"
+              "product-api カート",
+              "ゲートウェイのレートリミットカウンター"
             ],
             "status": "deployed"
           }
@@ -325,7 +326,7 @@
         "ソーシャルログインはGoogleのみ動作 — カカオ（KeycloakにIdP登録のみ）・NAVERのボタンはログイン画面で無効",
         "Veleroの定期的（3ヶ月など）な復元再検証ルーチンが必要",
         "Velero バックアップは原本と同じ単一HDDにのみ保存 — オフサイトコピーは未整備（保存先・認証情報は別途準備中）",
-        "レートリミットはposselect.com側のみ（Ingressミドルウェア + ゲートウェイのAPIルート6件）で、leedohyun.comは未適用。うちゲートウェイ側はRedis接続の問題により現在は制限が効いていない（gateway#308）。サーキットブレーカーは同じAPIルート6件に適用",
+        "レートリミットはposselect.com側のみ（Ingressミドルウェア + ゲートウェイのAPIルート6件）で、leedohyun.comは未適用。サーキットブレーカーは同じAPIルート6件に適用",
         "RAG 商品Q&A はコード・スキーマ・UI いずれもデプロイ済みだが、OPENAI_API_KEY シークレットが未登録のため呼び出し時 503 で固定 — キー登録が唯一の有効化条件(product.api#60)",
         "メインページの「最近見た商品」エリアは未実装 — 履歴がサイト（origin）単位のブラウザストレージにあり、product.posselect.comで見た商品をhomeから読めない。保存方式の決定待ち、タイムセールも未着手（store.front#37）",
         "自社(1P)商品 131件中130件に販売ポリシー(配送・返品条件)が未入力のため、商品詳細に配送・交換・返品案内が表示されない — 実際の条件確定待ち。販売者情報セクションも事業者登録前のため非表示(product.front#38)"
@@ -367,7 +368,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (単一ノード、control-plane兼worker)"
     },
-    "updated_at": "2026-10-02",
+    "updated_at": "2026-10-03",
     "improved": [
       {
         "name": "Spring Cloud Gateway 単一エントリポイント",
@@ -545,7 +546,7 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[インターネット] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|パートナーアカウント発行| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|パートナー API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|商品・バナー・お気に入り| PA\n            OA -.->|会員等級・割引率| AA\n            AA -.->|購入確定額| OA\n            PF -.->|商品QA| PA\n            PA -.->|埋め込み・回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets バケット| MO2[MinIO<br/>leedohyun.com タブと同じインスタンス]\n            UI -.->|署名付きURL| IP\n\n            GF -.->|メトリクススクレイピング| GW\n            GF -.->|メトリクススクレイピング| AA\n            GF -.->|メトリクススクレイピング| PA\n            GF -.->|メトリクススクレイピング| OA\n            GF -.->|エクスポーター経由| PG2\n            GF -.->|エクスポーター経由| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 会員・等級]\n            PA --> Redis2[Redis<br/>カート]\n        ",
+    "posselect": "\n            Internet[インターネット] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|パートナーアカウント発行| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|パートナー API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|商品・バナー・お気に入り| PA\n            OA -.->|会員等級・割引率| AA\n            AA -.->|購入確定額| OA\n            PF -.->|商品QA| PA\n            PA -.->|埋め込み・回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets バケット| MO2[MinIO<br/>leedohyun.com タブと同じインスタンス]\n            UI -.->|署名付きURL| IP\n\n            GF -.->|メトリクススクレイピング| GW\n            GF -.->|メトリクススクレイピング| AA\n            GF -.->|メトリクススクレイピング| PA\n            GF -.->|メトリクススクレイピング| OA\n            GF -.->|エクスポーター経由| PG2\n            GF -.->|エクスポーター経由| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 会員・等級]\n            PA --> Redis2[Redis<br/>カート]\n            GW -.->|レートリミットカウンター| Redis2\n        ",
     "leedohyun": "\n            Internet[インターネット] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家庭用ルーター<br/>ポート転送 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共有]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共有エントリポイント — 詳細は「共通インフラ」タブへ]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>現在ご覧のページ]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>両ドメイン共有エントリポイント] -.->|メール送信| MAIL[自前メールサーバー<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 通知]\n            LOKI[Loki / Promtail<br/>ログ収集]\n            JG[Jaeger<br/>分散トレーシング]\n            VL[Velero<br/>PVC バックアップ]\n\n            PROM -.->|メトリクススクレイピング| GW\n            LOKI -.->|全ネームスペース| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO に保存| MO[MinIO]\n        ",
     "domainsplit": "\n            subgraph before[以前: leedohyun.com 単一ドメイン]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[現在: ドメイン分離]\n                A1[leedohyun.com<br/>個人専用] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>ショップ専用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.移行.-> after\n        ",

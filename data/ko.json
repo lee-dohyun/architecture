@@ -251,7 +251,8 @@
           {
             "name": "Redis (customer ns)",
             "services": [
-              "product-api 장바구니"
+              "product-api 장바구니",
+              "게이트웨이 레이트리밋 카운터"
             ],
             "status": "deployed"
           }
@@ -326,7 +327,7 @@
         "간편 로그인은 구글만 동작 — 카카오(Keycloak IdP 등록만 된 상태)·네이버 버튼은 로그인 화면에서 비활성",
         "Velero 주기적(3개월 등) 복구 재검증 루틴 필요",
         "Velero 백업이 원본과 같은 단일 HDD에만 저장됨 — 오프사이트 사본 없음(목적지/자격증명은 별도 준비 중)",
-        "레이트리밋은 posselect.com 쪽에만 있음(Ingress 미들웨어 + 게이트웨이 API 라우트 6개), leedohyun.com 은 미적용. 그중 게이트웨이 쪽은 Redis 연결 문제로 현재 집행되지 않음(gateway#308). 서킷브레이커는 같은 API 라우트 6개에 적용",
+        "레이트리밋은 posselect.com 쪽에만 있음(Ingress 미들웨어 + 게이트웨이 API 라우트 6개), leedohyun.com 은 미적용. 서킷브레이커는 같은 API 라우트 6개에 적용",
         "RAG 상품 Q&A는 코드·스키마·UI가 모두 배포됐지만 OPENAI_API_KEY 시크릿이 미등록이라 호출 시 503으로 고정 — 키 등록이 유일한 활성화 조건(product.api#60)",
         "메인 페이지 「최근 본 상품」 영역 미구현 — 기록이 사이트(origin)별 브라우저 저장소에 있어 product.posselect.com 에서 본 상품을 home 에서 읽을 수 없음. 저장 방식 결정 대기, 타임세일도 미착수(store.front#37)",
         "자사(1P) 상품 131개 중 130개에 판매 정책(배송·반품 조건)이 아직 입력되지 않아 상품 상세의 배송·교환·반품 안내가 표시되지 않음 — 실제 조건 확정 대기, 판매자 정보 섹션도 사업자 등록 전이라 숨김(product.front#38)"
@@ -368,7 +369,7 @@
       "nodes": 1,
       "cluster_type": "K3s v1.33 (단일 노드, control-plane 겸 worker)"
     },
-    "updated_at": "2026-10-02",
+    "updated_at": "2026-10-03",
     "improved": [
       {
         "name": "Spring Cloud Gateway 단일 진입점",
@@ -546,7 +547,7 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|파트너 계정 발급| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|파트너 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|상품·배너·찜| PA\n            OA -.->|회원 등급·할인율| AA\n            AA -.->|구매확정액| OA\n            PF -.->|상품 질의응답| PA\n            PA -.->|임베딩·답변 생성| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]\n            UI -.->|서명 URL| IP\n\n            GF -.->|메트릭 스크레이핑| GW\n            GF -.->|메트릭 스크레이핑| AA\n            GF -.->|메트릭 스크레이핑| PA\n            GF -.->|메트릭 스크레이핑| OA\n            GF -.->|익스포터 경유| PG2\n            GF -.->|익스포터 경유| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 회원·등급]\n            PA --> Redis2[Redis<br/>장바구니]\n        ",
+    "posselect": "\n            Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|파트너 계정 발급| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|파트너 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|상품·배너·찜| PA\n            OA -.->|회원 등급·할인율| AA\n            AA -.->|구매확정액| OA\n            PF -.->|상품 질의응답| PA\n            PA -.->|임베딩·답변 생성| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]\n            UI -.->|서명 URL| IP\n\n            GF -.->|메트릭 스크레이핑| GW\n            GF -.->|메트릭 스크레이핑| AA\n            GF -.->|메트릭 스크레이핑| PA\n            GF -.->|메트릭 스크레이핑| OA\n            GF -.->|익스포터 경유| PG2\n            GF -.->|익스포터 경유| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 회원·등급]\n            PA --> Redis2[Redis<br/>장바구니]\n            GW -.->|레이트리밋 카운터| Redis2\n        ",
     "leedohyun": "\n            Internet[인터넷] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>지금 보고 계신 이 페이지]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>두 도메인 공용 진입점] -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 알림]\n            LOKI[Loki / Promtail<br/>로그 수집]\n            JG[Jaeger<br/>분산 트레이싱]\n            VL[Velero<br/>PVC 백업]\n\n            PROM -.->|메트릭 스크레이핑| GW\n            LOKI -.->|전 네임스페이스| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO에 저장| MO[MinIO]\n        ",
     "domainsplit": "\n            subgraph before[이전: leedohyun.com 단일 도메인]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[현재: 도메인 분리]\n                A1[leedohyun.com<br/>개인 전용] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>쇼핑몰 전용] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.전환.-> after\n        ",
