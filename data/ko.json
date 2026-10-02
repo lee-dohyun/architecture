@@ -65,6 +65,7 @@
             "name": "MinIO",
             "domains": [
               "minio.leedohyun.com",
+              "minio.posselect.com",
               "static.leedohyun.com"
             ],
             "desc": "S3 호환 오브젝트 스토리지. 개인용 및 쇼핑몰 공용 인스턴스.",
@@ -85,13 +86,6 @@
             ],
             "status": "deployed",
             "desc": "K3s 클러스터 아키텍처 시각화. ko/en/ja/zh 다국어 지원."
-          },
-          {
-            "name": "라우터 관리화면 프록시",
-            "domains": [
-              "router.leedohyun.com"
-            ],
-            "status": "deployed"
           }
         ],
         "shop_line": [
@@ -100,7 +94,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료. 카테고리 8x26 / 상품 128 / 배너 8종 데모 카탈로그로 확장 완료(2026-08-21).",
+            "desc": "쇼핑몰 메인 랜딩 페이지 (Next.js). 메인 페이지 영역별 상품 정보 및 배너 API 연동 완료. 카테고리 8x26 / 상품 128 / 배너 8종 데모 카탈로그로 확장 완료(2026-08-21). 대분류 카테고리 타일·퀵메뉴·상품 카드 찜 하트 추가(2026-10-02).",
             "status": "deployed"
           },
           {
@@ -108,7 +102,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "로그인/회원가입/정보수정 기능. 이용약관 및 개인정보방침 백엔드 저장 처리.",
+            "desc": "로그인/회원가입/정보수정 기능. 이용약관 및 개인정보방침 백엔드 저장 처리. 마이페이지에 회원 등급·혜택·다음 등급까지 남은 금액 표시, 구글 간편 로그인 회원의 가입 마무리(약관 동의 + 휴대폰 인증) 화면 추가(2026-10-02).",
             "status": "deployed"
           },
           {
@@ -116,7 +110,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "상품 목록 및 장바구니. 상품 정보 API 캐싱 적용 완료.",
+            "desc": "상품 목록 및 장바구니. 상품 정보 API 캐싱 적용 완료. 상품 목록은 24개씩 받아 「더보기」로 이어 받고, 찜(위시리스트)과 장바구니·결제 완료 화면의 회원 등급 할인 표시를 지원.",
             "status": "deployed"
           },
           {
@@ -132,7 +126,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "주문/결제 처리(Mock). 계정 자동 연결.",
+            "desc": "주문/결제 처리(Mock). 계정 자동 연결. 주문 금액에 회원 등급 할인을 적용하고 주문 시점 등급을 스냅샷으로 남김. 주문 확정은 오퍼(판매자별 판매 조건) 기준. 재고 복원 보상이 실패하면 미결 기록으로 남겨 스케줄러가 재시도.",
             "status": "deployed"
           },
           {
@@ -140,7 +134,7 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "관리자 백오피스. Keycloak(staff realm) 로그인. 상품 관리(상태·판매자 필터, 판매 정책 편집), 파트너 상품 검수 큐, 판매자 입점 심사·파트너 계정 발급(partner realm 서비스 계정).",
+            "desc": "관리자 백오피스. Keycloak(staff realm) 로그인. 상품 관리(상태·판매자 필터, 판매 정책 편집), 파트너 상품 검수 큐, 판매자 입점 심사·파트너 계정 발급(partner realm 서비스 계정). 회원 등급 정책 관리와 회원 등급 조회·수동 조정 화면 추가(2026-10-02).",
             "status": "deployed"
           },
           {
@@ -156,7 +150,7 @@
             "domains": [
               "/api/partner/** (partner.front 서버가 클러스터 내부로 호출)"
             ],
-            "desc": "partner realm JWT 를 product-api 가 직접 재검증(issuer + azp=partner-front)하고, 토큰의 seller_id 로 데이터 범위를 강제한다(남의 상품 404). 파트너 상품은 항상 미공개(DRAFT)로 생성되고 자동 검증 규칙(고시·판매 정책·금지어) → 직원 심사 → 승인 시에만 쇼핑몰에 노출. 공개 조회·장바구니·주문 확정은 판매 중(LIVE)이고 판매 기간 안인 상품만 허용.",
+            "desc": "partner realm JWT 를 product-api 가 직접 재검증(issuer + azp=partner-front)하고, 토큰의 seller_id 로 데이터 범위를 강제한다(남의 상품 404). 파트너 상품은 항상 미공개(DRAFT)로 생성되고 자동 검증 규칙(고시·판매 정책·금지어) → 직원 심사 → 승인 시에만 쇼핑몰에 노출. 공개 조회·장바구니·주문 확정은 판매 중(LIVE)이고 판매 기간 안인 상품만 허용. 정지·해지된 판매자의 상품은 노출은 유지하되 구매를 막는다(판매 중단 표시).",
             "status": "deployed"
           },
           {
@@ -237,17 +231,11 @@
             "status": "deployed"
           },
           {
-            "name": "PostgreSQL (catalog-postgres + pgvector, orders-postgres)",
+            "name": "PostgreSQL (customer ns 단일 인스턴스 — authdb / catalogdb + pgvector / ordersdb)",
             "services": [
+              "auth.api (회원·등급)",
               "product-api",
               "order-api"
-            ],
-            "status": "deployed"
-          },
-          {
-            "name": "PostgreSQL (postgres-service, customer ns)",
-            "services": [
-              "레거시, 인증 목적 미사용"
             ],
             "status": "deployed"
           }
@@ -318,7 +306,7 @@
           },
           {
             "name": "self-hosted runner 기반 CD (자동 배포)",
-            "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
+            "scope": "gateway / auth.api / product.api / order.api / store.front / customer.front / product.front / admin.front / partner.front / posselect-ui / posselect-shell / tool.front",
             "status": "deployed"
           },
           {
@@ -332,16 +320,16 @@
         "RBAC 세분화는 여전히 미적용. NetworkPolicy는 customer 네임스페이스(쇼핑몰)에만 default-deny-ingress+allow 규칙 적용 중(2026-08-17~), default 네임스페이스(개인 서비스)는 미적용. Istio/서비스 메시는 이 규모에 맞지 않는다고 판단해 의도적으로 도입하지 않음(대안: 게이트웨이 단일 진입점)",
         "분산 트레이싱은 Java 백엔드 4개만 계측됨(Next.js 프론트는 미계측), Kiali/서비스 메시 관찰성은 여전히 없음",
         "단일 장애점 (단일 노드 클러스터, 이중화 없음)",
-        "Alertmanager는 Email만 연동됨, Slack 등 추가 채널 미연동",
-        "자체 메일서버가 가정용 유동 IP+PTR 미설정이라 스팸함 도달 가능성 있음 (구조적 한계)",
+        "Alertmanager는 Email만 연동됨 — 그런데 Gmail이 서버 IP를 거부해 알림 메일이 전부 반송되고 있어 현재 알림이 도달하지 않음(2026-10-02 확인). Slack 등 대체 채널 미연동",
+        "자체 메일서버가 가정용 유동 IP+PTR 미설정인 데다, 2026-09 오픈 릴레이 악용 사고로 IP가 Spamhaus·Barracuda·UCEPROTECT 블랙리스트에 등재됨. 무인증 내부 릴레이는 폐지(전 발신자 587+SASL)했지만 2026-10-02 현재 등재가 풀리지 않아 외부 수신 서버가 메일을 거부함(gateway#276)",
         "architecture-web/tool/wordpress는 여전히 수동 배포",
-        "customer.front 간편 로그인(카카오/네이버/구글) 구현 및 휴대폰 본인인증 백엔드 연동 필요",
+        "간편 로그인은 구글만 동작 — 카카오(Keycloak IdP 등록만 된 상태)·네이버 버튼은 로그인 화면에서 비활성",
         "Velero 주기적(3개월 등) 복구 재검증 루틴 필요",
         "Velero 백업이 원본과 같은 단일 HDD에만 저장됨 — 오프사이트 사본 없음(목적지/자격증명은 별도 준비 중)",
         "레이트리밋은 posselect.com Ingress에만 적용, leedohyun.com은 미적용 — 서킷브레이커는 코드에 없음",
         "RAG 상품 Q&A는 코드·스키마·UI가 모두 배포됐지만 OPENAI_API_KEY 시크릿이 미등록이라 호출 시 503으로 고정 — 키 등록이 유일한 활성화 조건(product.api#60)",
-        "판매자를 정지·해지해도 그 판매자의 판매 중 상품이 쇼핑몰에서 계속 팔림 — 처리 방식 결정 대기(product.api#100)",
-        "자사(1P) 상품 129개에 판매 정책(배송·반품 조건)이 아직 입력되지 않아 상품 상세의 배송·교환·반품 안내가 표시되지 않음 — 실제 조건 확정 대기, 판매자 정보 섹션도 사업자 등록 전이라 숨김(product.front#38)"
+        "메인 페이지 「최근 본 상품」 영역 미구현 — 기록이 사이트(origin)별 브라우저 저장소에 있어 product.posselect.com 에서 본 상품을 home 에서 읽을 수 없음. 저장 방식 결정 대기, 타임세일도 미착수(store.front#37)",
+        "자사(1P) 상품 131개 중 130개에 판매 정책(배송·반품 조건)이 아직 입력되지 않아 상품 상세의 배송·교환·반품 안내가 표시되지 않음 — 실제 조건 확정 대기, 판매자 정보 섹션도 사업자 등록 전이라 숨김(product.front#38)"
       ]
     },
     "domain_split": {
@@ -353,7 +341,6 @@
         "minio/static",
         "tool",
         "architecture",
-        "router",
         "monitoring"
       ],
       "posselect_com": [
@@ -362,6 +349,7 @@
         "customer",
         "product",
         "admin",
+        "partner",
         "keycloak"
       ],
       "migrated_items": [
@@ -375,12 +363,12 @@
       "backward_compat": "기존 leedohyun.com 기반 호스트는 posselect.com으로 302 리다이렉트 처리하여 호환성 유지."
     },
     "resources": {
-      "cpu": "~5% (단일 6코어 Ryzen 5 1600 기준)",
-      "memory": "~19% (62Gi DDR4 듀얼채널 기준)",
+      "cpu": "~12% (24시간 평균 · 6코어 Ryzen 5 1600, 2026-10-02 측정)",
+      "memory": "~26% (24시간 평균 · 62Gi DDR4, 2026-10-02 측정)",
       "nodes": 1,
       "cluster_type": "K3s v1.33 (단일 노드, control-plane 겸 worker)"
     },
-    "updated_at": "2026-09-29",
+    "updated_at": "2026-10-02",
     "improved": [
       {
         "name": "Spring Cloud Gateway 단일 진입점",
@@ -409,10 +397,10 @@
       {
         "name": "Alertmanager 외부 알림",
         "domains": [
-          "Email 알림 채널 연동 완료. 추가 채널 추후 계획"
+          "Email 알림 채널 연동 완료 — 단 수신측(Gmail)이 서버 IP를 거부해 현재 알림 메일이 반송됨. 대체 채널 필요"
         ],
         "status": "deployed",
-        "status_text": "완료됨(Email)"
+        "status_text": "연동됨(메일 반송 중)"
       },
       {
         "name": "Jaeger (분산 트레이싱)",
@@ -439,12 +427,12 @@
         "status_text": "계획됨"
       },
       {
-        "name": "공급망 보안 (Dependabot + Trivy 이미지 스캔)",
+        "name": "공급망 보안 (Dependabot + Trivy 이미지 스캔 + gitleaks 시크릿 스캔)",
         "domains": [
-          "의존성 자동 업데이트 PR + 컨테이너 이미지 취약점 스캔 전 저장소 롤아웃 완료"
+          "의존성 자동 업데이트 PR + 컨테이너 이미지 취약점 스캔 + 커밋 시크릿 유출 스캔(gitleaks, 2026-10-01) 전 저장소 롤아웃 완료 (Dependabot 은 tool.front 제외)"
         ],
         "status": "deployed",
-        "status_text": "완료됨(11개 저장소)"
+        "status_text": "완료됨(13개 저장소)"
       },
       {
         "name": "architecture-web 다국어 지원 (ko/en/ja/zh)",
@@ -477,6 +465,38 @@
         ],
         "status": "deployed",
         "status_text": "완료됨"
+      },
+      {
+        "name": "회원 등급(멤버십) — 정책 관리·주문 할인·고객 표시",
+        "domains": [
+          "관리자가 등급 정책을 관리하고, 주문 금액에 등급 할인을 적용해 주문 시점 등급을 스냅샷으로 남기며, 마이페이지·장바구니·결제 완료 화면에 등급과 혜택을 표시하는 흐름 전체 배포(2026-10-02)"
+        ],
+        "status": "deployed",
+        "status_text": "완료됨"
+      },
+      {
+        "name": "재고 보상 트랜잭션 — 미결 기록 + 재시도",
+        "domains": [
+          "order-api 가 재고 복원(보상) 호출에 실패하면 미결 기록(inventory_compensations)으로 남기고 스케줄러가 재시도. product-api 에서는 복원된 주문을 다시 차감할 때 재고가 빠지지 않던 결함을 수정(2026-10-02)"
+        ],
+        "status": "deployed",
+        "status_text": "완료됨"
+      },
+      {
+        "name": "메인 페이지 확장 — 카테고리 타일·퀵메뉴·찜",
+        "domains": [
+          "대분류 카테고리 타일, 퀵메뉴(장바구니·고객센터·맨 위로), 상품 카드 찜 하트 배포(2026-10-02). 최근 본 상품·타임세일은 남음"
+        ],
+        "status": "deployed",
+        "status_text": "부분 완료"
+      },
+      {
+        "name": "보안 점검 후속 조치 (2026-09-28)",
+        "domains": [
+          "메일 무인증 내부 릴레이 폐지(전 발신자 587+SASL), 라우터 관리화면 프록시 라우트 제거, SSH 비밀번호 인증 차단, Next.js 보안 패치 반영. 일부 후속 조치는 진행 중(gateway#277)"
+        ],
+        "status": "deployed",
+        "status_text": "주요 조치 완료"
       }
     ],
     "roadmap": {
@@ -526,10 +546,10 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|파트너 계정 발급| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|파트너 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|상품 질의응답| PA\n            PA -.->|임베딩·답변 생성| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]\n            UI -.->|서명 URL| IP\n\n            GF -.->|메트릭 스크레이핑| GW\n            GF -.->|메트릭 스크레이핑| AA\n            GF -.->|메트릭 스크레이핑| PA\n            GF -.->|메트릭 스크레이핑| OA\n            GF -.->|익스포터 경유| PG2\n            GF -.->|익스포터 경유| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>장바구니]\n        ",
-    "leedohyun": "\n            Internet[인터넷] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>지금 보고 계신 이 페이지]\n            GW --> RT[라우터 관리화면 프록시]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
+    "posselect": "\n            Internet[인터넷] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|파트너 계정 발급| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|파트너 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|상품·배너·찜| PA\n            OA -.->|회원 등급·할인율| AA\n            AA -.->|구매확정액| OA\n            PF -.->|상품 질의응답| PA\n            PA -.->|임베딩·답변 생성| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 버킷| MO2[MinIO<br/>leedohyun.com 탭과 동일 인스턴스]\n            UI -.->|서명 URL| IP\n\n            GF -.->|메트릭 스크레이핑| GW\n            GF -.->|메트릭 스크레이핑| AA\n            GF -.->|메트릭 스크레이핑| PA\n            GF -.->|메트릭 스크레이핑| OA\n            GF -.->|익스포터 경유| PG2\n            GF -.->|익스포터 경유| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 회원·등급]\n            PA --> Redis2[Redis<br/>장바구니]\n        ",
+    "leedohyun": "\n            Internet[인터넷] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[가정용 라우터<br/>포트포워딩 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP 공유]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com과 공용 진입점 — 자세한 건 '공통 인프라' 탭]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>지금 보고 계신 이 페이지]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>두 도메인 공용 진입점] -.->|메일 발송| MAIL[자체 메일서버<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 알림]\n            LOKI[Loki / Promtail<br/>로그 수집]\n            JG[Jaeger<br/>분산 트레이싱]\n            VL[Velero<br/>PVC 백업]\n\n            PROM -.->|메트릭 스크레이핑| GW\n            LOKI -.->|전 네임스페이스| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO에 저장| MO[MinIO]\n        ",
-    "domainsplit": "\n            subgraph before[이전: leedohyun.com 단일 도메인]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[현재: 도메인 분리]\n                A1[leedohyun.com<br/>개인 전용] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>쇼핑몰 전용] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.전환.-> after\n        ",
+    "domainsplit": "\n            subgraph before[이전: leedohyun.com 단일 도메인]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[현재: 도메인 분리]\n                A1[leedohyun.com<br/>개인 전용] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>쇼핑몰 전용] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.전환.-> after\n        ",
     "improved": "\n            Internet[인터넷] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[개인 라우터]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>단일 진입점 - 이미 완료]\n            Traefik --> Istio[Istio 서비스 메시<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> KC[Keycloak]\n            GW --> Shop[쇼핑몰 - posselect.com]\n\n            GW --> Monitor[모니터링/로그 스택<br/>Prometheus/Grafana/Loki - 완료]\n            Monitor --> AlertManager[Alertmanager<br/>Email 완료, Slack 계획]\n\n            GW --> Observability[관찰성 스택]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>Java 백엔드 4개 완료]\n\n            GW --> Storage[스토리지]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC 자동 백업 완료]\n        ",
     "roadmap": "\n            subgraph now[\"지금 — 홈서버 (과도기)\"]\n                direction TB\n                MinIO2[MinIO<br/>shop/static, shop/image]\n                ImgProxy[imgproxy<br/>이미지 가공]\n            end\n\n            subgraph later[\"나중 — 클라우드 전환 시점\"]\n                direction TB\n                S3[S3 호환 스토리지<br/>동일한 키 구조 그대로 이전]\n                CDN2[CloudFront / Cloudflare<br/>단일 cdn.posselect.com + 경로 구분]\n            end\n\n            subgraph newcap[\"신규 기능 — 처음부터 클라우드로\"]\n                direction TB\n                Video[VOD<br/>Cloudflare Stream / Mux 등]\n                Live[라이브 스트리밍<br/>AWS IVS / MediaConvert 등]\n            end\n\n            now -.->|\"이름/URL 체계는 유지, 백엔드만 교체\"| later\n        "
   }

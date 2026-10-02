@@ -64,6 +64,7 @@
             "name": "MinIO",
             "domains": [
               "minio.leedohyun.com",
+              "minio.posselect.com",
               "static.leedohyun.com"
             ],
             "desc": "兼容S3的对象存储。个人和商城共用实例。",
@@ -84,13 +85,6 @@
             ],
             "status": "deployed",
             "desc": "K3s 集群架构可视化。支持 ko/en/ja/zh 多语言。"
-          },
-          {
-            "name": "路由器管理界面代理",
-            "domains": [
-              "router.leedohyun.com"
-            ],
-            "status": "deployed"
           }
         ],
         "shop_line": [
@@ -99,7 +93,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。 已扩展为 8x26 分类 / 128 件商品 / 8 个横幅的演示目录（2026-08-21 完成）。",
+            "desc": "商城主落地页（Next.js）。主页面各区域商品信息及横幅API对接完成。 已扩展为 8x26 分类 / 128 件商品 / 8 个横幅的演示目录（2026-08-21 完成）。新增大类分类磁贴、快捷菜单及商品卡片收藏按钮（2026-10-02）。",
             "status": "deployed"
           },
           {
@@ -107,7 +101,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "登录/注册/修改信息功能。服务条款和隐私政策后端保存处理完毕。",
+            "desc": "登录/注册/修改信息功能。服务条款和隐私政策后端保存处理完毕。我的页面显示会员等级、权益及距下一等级的差额；Google 社交登录会员通过注册完成页（同意条款 + 手机验证）完成注册（2026-10-02）。",
             "status": "deployed"
           },
           {
@@ -115,7 +109,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "商品列表和购物车。商品信息API缓存应用完成。",
+            "desc": "商品列表和购物车。商品信息API缓存应用完成。商品列表每次加载 24 件，通过「查看更多」继续加载；支持收藏（心愿单），并在购物车和下单完成页显示会员等级折扣。",
             "status": "deployed"
           },
           {
@@ -131,7 +125,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "订单/支付处理（Mock）。自动关联账户。",
+            "desc": "订单/支付处理（Mock）。自动关联账户。订单金额应用会员等级折扣，并保存下单时的等级快照。订单确认以报价（各卖家的销售条件）为准。库存恢复补偿失败时记录为待处理，由调度器重试。",
             "status": "deployed"
           },
           {
@@ -139,7 +133,7 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "管理后台。Keycloak(staff realm)登录。商品管理(状态·卖家筛选、销售政策编辑)、合作商商品审核队列、卖家入驻审核与合作商账号发放(partner realm 服务账号)。",
+            "desc": "管理后台。Keycloak(staff realm)登录。商品管理(状态·卖家筛选、销售政策编辑)、合作商商品审核队列、卖家入驻审核与合作商账号发放(partner realm 服务账号)。新增会员等级策略管理及会员等级查询、手动调整页面（2026-10-02）。",
             "status": "deployed"
           },
           {
@@ -155,7 +149,7 @@
             "domains": [
               "/api/partner/**(由 partner.front 服务器在集群内部调用)"
             ],
-            "desc": "product-api 自行复核 partner realm 的 JWT(issuer + azp=partner-front),并用令牌中的 seller_id 强制数据范围(他人商品返回 404)。合作商商品始终以未公开(DRAFT)状态创建,经自动规则校验(公示·销售政策·禁用词)→ 员工审核 → 批准后才在商城上架。公开查询、购物车与下单定价只接受在售(LIVE)且处于销售期间内的商品。",
+            "desc": "product-api 自行复核 partner realm 的 JWT(issuer + azp=partner-front),并用令牌中的 seller_id 强制数据范围(他人商品返回 404)。合作商商品始终以未公开(DRAFT)状态创建,经自动规则校验(公示·销售政策·禁用词)→ 员工审核 → 批准后才在商城上架。公开查询、购物车与下单定价只接受在售(LIVE)且处于销售期间内的商品。被暂停或解约卖家的商品保持展示但禁止购买（显示为停止销售）。",
             "status": "deployed"
           },
           {
@@ -236,17 +230,11 @@
             "status": "deployed"
           },
           {
-            "name": "PostgreSQL (catalog-postgres + pgvector, orders-postgres)",
+            "name": "PostgreSQL (customer ns 单实例 — authdb / catalogdb + pgvector / ordersdb)",
             "services": [
+              "auth.api (会员、等级)",
               "product-api",
               "order-api"
-            ],
-            "status": "deployed"
-          },
-          {
-            "name": "PostgreSQL (postgres-service, customer ns)",
-            "services": [
-              "遗留，不用于身份验证"
             ],
             "status": "deployed"
           }
@@ -317,7 +305,7 @@
           },
           {
             "name": "基于self-hosted runner的CD (自动部署)",
-            "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
+            "scope": "gateway / auth.api / product.api / order.api / store.front / customer.front / product.front / admin.front / partner.front / posselect-ui / posselect-shell / tool.front",
             "status": "deployed"
           },
           {
@@ -331,16 +319,16 @@
         "RBAC 细分仍未应用。NetworkPolicy（default-deny-ingress + allow 规则）仅在 customer 命名空间（商城，自 2026-08-17 起）应用，default 命名空间（个人服务）未应用。判断 Istio/服务网格在此规模下属于过度设计，故意未引入（替代方案：网关单一入口）",
         "分布式追踪仅测量了4个Java后端（Next.js前端未测量），Kiali/服务网格可观测性仍然缺失",
         "单点故障（单节点集群，无冗余）",
-        "Alertmanager仅集成了Email，Slack等额外频道尚未集成",
-        "自建邮件服务器因家庭动态IP+无PTR设置，存在进入垃圾邮件箱的可能性（结构性限制）",
+        "Alertmanager 仅对接 Email — 且 Gmail 拒收本服务器 IP，告警邮件全部被退回，目前告警无法送达（2026-10-02 确认）。尚未对接 Slack 等替代渠道",
+        "自建邮件服务器使用家用动态 IP 且未设置 PTR，加之 2026-09 开放中继被滥用事件，IP 已被 Spamhaus、Barracuda、UCEPROTECT 列入黑名单。已取消免认证内部中继（所有发信方改用 587+SASL），但截至 2026-10-02 仍未解除，外部收件服务器会拒收邮件（gateway#276）",
         "architecture-web/tool/wordpress仍然手动部署",
-        "customer.front需要实现社交登录（Kakao/Naver/Google）及手机身份验证后端对接",
+        "社交登录仅 Google 可用 — Kakao（仅在 Keycloak 注册了 IdP）和 Naver 按钮在登录页为禁用状态",
         "Velero需要定期（如3个月）的恢复重新验证例程",
         "Velero 备份仅存放在与原始数据相同的单个硬盘上 — 尚无异地副本（存储目的地与凭证正在另行准备）",
         "限流仅应用于 posselect.com 的 Ingress，leedohyun.com 尚未应用 — 断路器完全未在代码中实现",
         "RAG 商品问答的代码、schema 与 UI 均已部署，但因未注册 OPENAI_API_KEY 密钥而固定返回 503 — 注册密钥是唯一的启用条件(product.api#60)",
-        "暂停或终止卖家后,该卖家的在售商品仍会在商城继续销售 — 处理方式待定(product.api#100)",
-        "129 件自营(1P)商品尚未填写销售政策(配送·退货条件),商品详情页不显示配送·换货·退货说明 — 等待实际条件确定;卖家信息区块也因尚未办理营业登记而隐藏(product.front#38)"
+        "首页「最近浏览」区域尚未实现 — 浏览记录保存在按站点（origin）隔离的浏览器存储中，home 无法读取在 product.posselect.com 浏览的商品。存储方式待定，限时特卖也未开始（store.front#37）",
+        "131 件自营(1P)商品中有 130 件尚未填写销售政策(配送·退货条件),商品详情页不显示配送·换货·退货说明 — 等待实际条件确定;卖家信息区块也因尚未办理营业登记而隐藏(product.front#38)"
       ]
     },
     "domain_split": {
@@ -352,7 +340,6 @@
         "minio/static",
         "tool",
         "architecture",
-        "router",
         "monitoring"
       ],
       "posselect_com": [
@@ -361,6 +348,7 @@
         "customer",
         "product",
         "admin",
+        "partner",
         "keycloak"
       ],
       "migrated_items": [
@@ -374,12 +362,12 @@
       "backward_compat": "传统的基于leedohyun.com的主机已被重定向至posselect.com，以保持兼容性。"
     },
     "resources": {
-      "cpu": "~5% (基于单路6核 Ryzen 5 1600)",
-      "memory": "~19% (基于62Gi DDR4 双通道)",
+      "cpu": "~12% (24 小时平均，6 核 Ryzen 5 1600，2026-10-02 测量)",
+      "memory": "~26% (24 小时平均，62Gi DDR4，2026-10-02 测量)",
       "nodes": 1,
       "cluster_type": "K3s v1.33 (单节点，control-plane兼worker)"
     },
-    "updated_at": "2026-09-29",
+    "updated_at": "2026-10-02",
     "improved": [
       {
         "name": "Spring Cloud Gateway 单一入口点",
@@ -408,10 +396,10 @@
       {
         "name": "Alertmanager 外部警报",
         "domains": [
-          "Email通知频道集成已完成。计划后续增加其他频道"
+          "Email 告警渠道已对接 — 但收件方（Gmail）拒收本服务器 IP，目前告警邮件被退回。需要替代渠道"
         ],
         "status": "deployed",
-        "status_text": "已完成(Email)"
+        "status_text": "已对接（邮件退回中）"
       },
       {
         "name": "Jaeger (分布式追踪)",
@@ -438,12 +426,12 @@
         "status_text": "计划中"
       },
       {
-        "name": "供应链安全（Dependabot + Trivy 镜像扫描）",
+        "name": "供应链安全（Dependabot + Trivy 镜像扫描 + gitleaks 密钥扫描）",
         "domains": [
-          "依赖自动更新 PR + 容器镜像漏洞扫描已在全部仓库完成推广"
+          "依赖自动更新 PR + 容器镜像漏洞扫描 + 提交密钥泄露扫描（gitleaks，2026-10-01）已在所有仓库上线（Dependabot 不含 tool.front）"
         ],
         "status": "deployed",
-        "status_text": "已完成（11 个仓库）"
+        "status_text": "已完成（13 个仓库）"
       },
       {
         "name": "architecture-web 多语言支持（ko/en/ja/zh）",
@@ -476,6 +464,38 @@
         ],
         "status": "deployed",
         "status_text": "已完成"
+      },
+      {
+        "name": "会员等级（会员体系） — 策略管理、订单折扣、客户展示",
+        "domains": [
+          "已部署完整流程（2026-10-02）：管理员管理等级策略，订单金额应用等级折扣并保存下单时的等级快照，在我的页面、购物车和下单完成页显示等级与权益"
+        ],
+        "status": "deployed",
+        "status_text": "已完成"
+      },
+      {
+        "name": "库存补偿事务 — 待处理记录 + 重试",
+        "domains": [
+          "order-api 调用库存恢复（补偿）失败时，记录为待处理（inventory_compensations）并由调度器重试。product-api 同时修复了对已恢复订单再次扣减时库存未减少的缺陷（2026-10-02）"
+        ],
+        "status": "deployed",
+        "status_text": "已完成"
+      },
+      {
+        "name": "首页扩展 — 分类磁贴、快捷菜单、收藏",
+        "domains": [
+          "已部署大类分类磁贴、快捷菜单（购物车、客服中心、回到顶部）及商品卡片收藏按钮（2026-10-02）。最近浏览与限时特卖尚未完成"
+        ],
+        "status": "deployed",
+        "status_text": "部分完成"
+      },
+      {
+        "name": "安全检查后续措施 (2026-09-28)",
+        "domains": [
+          "取消邮件免认证内部中继（所有发信方改用 587+SASL）、移除路由器管理页代理路由、禁用 SSH 密码认证、应用 Next.js 安全补丁。部分后续措施仍在进行中（gateway#277）"
+        ],
+        "status": "deployed",
+        "status_text": "主要措施已完成"
       }
     ],
     "roadmap": {
@@ -525,10 +545,10 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[互联网] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|发放合作商账号| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|合作商 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|商品问答| PA\n            PA -.->|嵌入与回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 存储桶| MO2[MinIO<br/>leedohyun.com 与标签页相同实例]\n            UI -.->|签名URL| IP\n\n            GF -.->|指标抓取| GW\n            GF -.->|指标抓取| AA\n            GF -.->|指标抓取| PA\n            GF -.->|指标抓取| OA\n            GF -.->|通过Exporter| PG2\n            GF -.->|通过Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>购物车]\n        ",
-    "leedohyun": "\n            Internet[互联网] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>您当前正在查看的页面]\n            GW --> RT[路由器管理代理]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
+    "posselect": "\n            Internet[互联网] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|发放合作商账号| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|合作商 API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|商品、横幅、收藏| PA\n            OA -.->|会员等级、折扣率| AA\n            AA -.->|确认购买金额| OA\n            PF -.->|商品问答| PA\n            PA -.->|嵌入与回答生成| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets 存储桶| MO2[MinIO<br/>leedohyun.com 与标签页相同实例]\n            UI -.->|签名URL| IP\n\n            GF -.->|指标抓取| GW\n            GF -.->|指标抓取| AA\n            GF -.->|指标抓取| PA\n            GF -.->|指标抓取| OA\n            GF -.->|通过Exporter| PG2\n            GF -.->|通过Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth 会员、等级]\n            PA --> Redis2[Redis<br/>购物车]\n        ",
+    "leedohyun": "\n            Internet[互联网] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[家用路由器<br/>端口转发 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP共享]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com 共享入口 — 详见“通用基础设施”标签页]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>您当前正在查看的页面]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>两个域名共享入口] -.->|发送邮件| MAIL[自建邮件服务器<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email 警报]\n            LOKI[Loki / Promtail<br/>日志收集]\n            JG[Jaeger<br/>分布式追踪]\n            VL[Velero<br/>PVC 备份]\n\n            PROM -.->|指标抓取| GW\n            LOKI -.->|所有命名空间| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO 保存至| MO[MinIO]\n        ",
-    "domainsplit": "\n            subgraph before[以前: leedohyun.com 单一域名]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[当前: 域名分离]\n                A1[leedohyun.com<br/>个人专用] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>商城专用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.迁移.-> after\n        ",
+    "domainsplit": "\n            subgraph before[以前: leedohyun.com 单一域名]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[当前: 域名分离]\n                A1[leedohyun.com<br/>个人专用] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>商城专用] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.迁移.-> after\n        ",
     "improved": "\n            Internet[互联网] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[个人路由器]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>单一入口 - 已完成]\n            Traefik --> Istio[Istio 服务网格<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> KC[Keycloak]\n            GW --> Shop[商城 - posselect.com]\n\n            GW --> Monitor[监控/日志栈<br/>Prometheus/Grafana/Loki - 已完成]\n            Monitor --> AlertManager[Alertmanager<br/>Email 已完成，计划支持Slack]\n\n            GW --> Observability[可观测性栈]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>4个Java后端已完成]\n\n            GW --> Storage[存储]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC 自动备份完成]\n        ",
     "roadmap": "\n            subgraph now[\"现在 - 家庭服务器（过渡期）\"]\n                direction TB\n                MinIO2[MinIO<br/>shop/static, shop/image]\n                ImgProxy[imgproxy<br/>图像处理]\n            end\n\n            subgraph later[\"未来 - 云端迁移时\"]\n                direction TB\n                S3[S3 兼容存储<br/>使用相同的键结构迁移]\n                CDN2[CloudFront / Cloudflare<br/>单一 cdn.posselect.com + 路径路由]\n            end\n\n            subgraph newcap[\"新功能 - 云原生\"]\n                direction TB\n                Video[VOD<br/>Cloudflare Stream / Mux 等]\n                Live[直播<br/>AWS IVS / MediaConvert 等]\n            end\n\n            now -.->|\"保持名称/URL体系，仅替换后端\"| later\n        "
   }

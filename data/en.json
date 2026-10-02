@@ -64,6 +64,7 @@
             "name": "MinIO",
             "domains": [
               "minio.leedohyun.com",
+              "minio.posselect.com",
               "static.leedohyun.com"
             ],
             "desc": "S3-compatible object storage. Shared instance for personal and shopping mall use.",
@@ -84,13 +85,6 @@
             ],
             "status": "deployed",
             "desc": "K3s cluster architecture visualization. Supports ko/en/ja/zh."
-          },
-          {
-            "name": "Router Admin Proxy",
-            "domains": [
-              "router.leedohyun.com"
-            ],
-            "status": "deployed"
           }
         ],
         "shop_line": [
@@ -99,7 +93,7 @@
             "domains": [
               "home.posselect.com"
             ],
-            "desc": "Shopping mall main landing page (Next.js). Product info and banner API integration completed for main page sections. Expanded to a demo catalog of 8x26 categories / 128 products / 8 banners (completed 2026-08-21).",
+            "desc": "Shopping mall main landing page (Next.js). Product info and banner API integration completed for main page sections. Expanded to a demo catalog of 8x26 categories / 128 products / 8 banners (completed 2026-08-21). Top-level category tiles, quick menu and wishlist hearts on product cards added (2026-10-02).",
             "status": "deployed"
           },
           {
@@ -107,7 +101,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "Login/Signup/Profile editing features. Backend integration completed for terms of service and privacy policy.",
+            "desc": "Login/Signup/Profile editing features. Backend integration completed for terms of service and privacy policy. My page shows the membership grade, benefits and the amount left to the next grade; Google social-login members finish sign-up on an onboarding screen (terms consent + phone verification) (2026-10-02).",
             "status": "deployed"
           },
           {
@@ -115,7 +109,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "Product list and cart. Product info API caching applied.",
+            "desc": "Product list and cart. Product info API caching applied. The product list loads 24 items at a time with a \"Load more\" button; supports wishlists and shows the membership grade discount on the cart and order-complete screens.",
             "status": "deployed"
           },
           {
@@ -131,7 +125,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "Order/Payment processing (Mock). Automatic account linking.",
+            "desc": "Order/Payment processing (Mock). Automatic account linking. Applies the membership grade discount to the order amount and snapshots the grade at order time. Orders are confirmed per offer (seller-specific sales terms). Failed stock-restore compensations are recorded as pending and retried by a scheduler.",
             "status": "deployed"
           },
           {
@@ -139,7 +133,7 @@
             "domains": [
               "admin.posselect.com"
             ],
-            "desc": "Admin back office. Keycloak (staff realm) login. Product management (status/seller filters, sales policy editing), partner product review queue, seller onboarding review and partner account issuance (partner realm service account).",
+            "desc": "Admin back office. Keycloak (staff realm) login. Product management (status/seller filters, sales policy editing), partner product review queue, seller onboarding review and partner account issuance (partner realm service account). Membership grade policy management and member grade lookup / manual adjustment screens added (2026-10-02).",
             "status": "deployed"
           },
           {
@@ -155,7 +149,7 @@
             "domains": [
               "/api/partner/** (called in-cluster by the partner.front server)"
             ],
-            "desc": "product-api re-verifies partner realm JWTs itself (issuer + azp=partner-front) and enforces data scope with the token's seller_id (other sellers' products → 404). Partner products are always created unpublished (DRAFT) and reach the shop only after automated rule checks (disclosures, sales policy, banned words) → staff review → approval. Public reads, cart and order pricing accept only LIVE products within their sale period.",
+            "desc": "product-api re-verifies partner realm JWTs itself (issuer + azp=partner-front) and enforces data scope with the token's seller_id (other sellers' products → 404). Partner products are always created unpublished (DRAFT) and reach the shop only after automated rule checks (disclosures, sales policy, banned words) → staff review → approval. Public reads, cart and order pricing accept only LIVE products within their sale period. Products of suspended or terminated sellers stay visible but cannot be purchased (shown as sales suspended).",
             "status": "deployed"
           },
           {
@@ -236,17 +230,11 @@
             "status": "deployed"
           },
           {
-            "name": "PostgreSQL (catalog-postgres + pgvector, orders-postgres)",
+            "name": "PostgreSQL (single instance in customer ns — authdb / catalogdb + pgvector / ordersdb)",
             "services": [
+              "auth.api (members, grades)",
               "product-api",
               "order-api"
-            ],
-            "status": "deployed"
-          },
-          {
-            "name": "PostgreSQL (postgres-service, customer ns)",
-            "services": [
-              "Legacy, not used for authentication"
             ],
             "status": "deployed"
           }
@@ -317,7 +305,7 @@
           },
           {
             "name": "self-hosted runner CD (Auto deployment)",
-            "scope": "gateway / auth.api / store.front / customer.front / admin.front / order.api / product.api",
+            "scope": "gateway / auth.api / product.api / order.api / store.front / customer.front / product.front / admin.front / partner.front / posselect-ui / posselect-shell / tool.front",
             "status": "deployed"
           },
           {
@@ -331,16 +319,16 @@
         "RBAC granularity is still not applied. NetworkPolicy (default-deny-ingress + allow rules) is applied only in the customer namespace (shop, since 2026-08-17) — the default namespace (personal services) has none. Istio/service mesh was deliberately not adopted as overkill for this scale (alternative: single gateway entry point)",
         "Distributed tracing only measures 4 Java backends (Next.js frontends not measured), no Kiali/Service Mesh observability yet",
         "Single point of failure (Single node cluster, no redundancy)",
-        "Alertmanager only integrated with Email, additional channels like Slack not integrated",
-        "Self-hosted mail server uses home dynamic IP+no PTR, potential spam folder delivery (Structural limit)",
+        "Alertmanager is integrated with Email only — and Gmail rejects the server IP, so every alert mail bounces and alerts currently do not arrive (checked 2026-10-02). No alternative channel such as Slack yet",
+        "The self-hosted mail server sits on a residential dynamic IP with no PTR, and after the 2026-09 open-relay abuse incident the IP is listed on Spamhaus, Barracuda and UCEPROTECT. Unauthenticated internal relay has been removed (all senders use 587+SASL), but as of 2026-10-02 the listings remain, so external receivers reject its mail (gateway#276)",
         "architecture-web/tool/wordpress are still deployed manually",
-        "customer.front needs social login (Kakao/Naver/Google) and phone verification backend integration",
+        "Social login works with Google only — the Kakao (IdP registered in Keycloak, not wired to the screen) and Naver buttons are disabled on the login screen",
         "Velero needs periodic (e.g. 3 months) recovery validation routine",
         "Velero backups live on the same single HDD as the source data — no offsite copy yet (destination/credentials being prepared separately)",
         "Rate limiting is applied only to the posselect.com Ingress (not leedohyun.com) — circuit breaker is not implemented at all",
         "RAG Product Q&A is fully deployed (code, schema, UI) but pinned to 503 because the OPENAI_API_KEY secret is not registered — registering the key is the only remaining activation step (product.api#60)",
-        "Suspending or terminating a seller does not stop their live products from being sold — handling policy pending (product.api#100)",
-        "The 129 first-party products have no sales policy (shipping/return terms) yet, so the product page shows no shipping/exchange/return info — waiting for actual terms; the seller info section is also hidden until business registration (product.front#38)"
+        "The \"recently viewed\" rail on the main page is not built — the history lives in per-site (origin) browser storage, so products viewed on product.posselect.com cannot be read on home. Storage approach pending; time sale not started either (store.front#37)",
+        "130 of the 131 first-party products have no sales policy (shipping/return terms) yet, so the product page shows no shipping/exchange/return info — waiting for actual terms; the seller info section is also hidden until business registration (product.front#38)"
       ]
     },
     "domain_split": {
@@ -352,7 +340,6 @@
         "minio/static",
         "tool",
         "architecture",
-        "router",
         "monitoring"
       ],
       "posselect_com": [
@@ -361,6 +348,7 @@
         "customer",
         "product",
         "admin",
+        "partner",
         "keycloak"
       ],
       "migrated_items": [
@@ -374,12 +362,12 @@
       "backward_compat": "Legacy leedohyun.com based hosts redirect to posselect.com with 302 to maintain compatibility."
     },
     "resources": {
-      "cpu": "~5% (Based on single 6-core Ryzen 5 1600)",
-      "memory": "~19% (Based on 62Gi DDR4 Dual Channel)",
+      "cpu": "~12% (24h average, single 6-core Ryzen 5 1600, measured 2026-10-02)",
+      "memory": "~26% (24h average, 62Gi DDR4, measured 2026-10-02)",
       "nodes": 1,
       "cluster_type": "K3s v1.33 (Single node, control-plane + worker)"
     },
-    "updated_at": "2026-09-29",
+    "updated_at": "2026-10-02",
     "improved": [
       {
         "name": "Spring Cloud Gateway Single Entry Point",
@@ -408,10 +396,10 @@
       {
         "name": "Alertmanager External Alerts",
         "domains": [
-          "Email alert channel integration completed. Additional channels planned later"
+          "Email alert channel integrated — but the recipient (Gmail) rejects the server IP, so alert mails currently bounce. An alternative channel is needed"
         ],
         "status": "deployed",
-        "status_text": "Completed(Email)"
+        "status_text": "Integrated (mail bouncing)"
       },
       {
         "name": "Jaeger (Distributed Tracing)",
@@ -438,12 +426,12 @@
         "status_text": "Planned"
       },
       {
-        "name": "Supply Chain Security (Dependabot + Trivy Image Scan)",
+        "name": "Supply Chain Security (Dependabot + Trivy Image Scan + gitleaks Secret Scan)",
         "domains": [
-          "Automated dependency update PRs + container image vulnerability scanning rolled out across all repositories"
+          "Automated dependency update PRs + container image vulnerability scanning + secret-leak scanning on commits (gitleaks, 2026-10-01) rolled out across all repositories (Dependabot: all except tool.front)"
         ],
         "status": "deployed",
-        "status_text": "Completed (11 repos)"
+        "status_text": "Completed (13 repos)"
       },
       {
         "name": "architecture-web Multilingual Support (ko/en/ja/zh)",
@@ -476,6 +464,38 @@
         ],
         "status": "deployed",
         "status_text": "Completed"
+      },
+      {
+        "name": "Membership grades — policy management, order discount, customer display",
+        "domains": [
+          "Full flow deployed (2026-10-02): staff manage grade policies, the grade discount is applied to the order amount with the grade snapshotted at order time, and the grade and benefits are shown on my page, cart and order-complete screens"
+        ],
+        "status": "deployed",
+        "status_text": "Completed"
+      },
+      {
+        "name": "Inventory compensation — pending records + retry",
+        "domains": [
+          "When order-api fails to call the stock-restore (compensation) endpoint, it records the attempt as pending (inventory_compensations) and a scheduler retries it. product-api also fixes a defect where re-deducting stock for a previously restored order did not reduce inventory (2026-10-02)"
+        ],
+        "status": "deployed",
+        "status_text": "Completed"
+      },
+      {
+        "name": "Main page expansion — category tiles, quick menu, wishlist",
+        "domains": [
+          "Top-level category tiles, quick menu (cart, customer center, back to top) and wishlist hearts on product cards deployed (2026-10-02). Recently-viewed rail and time sale remain"
+        ],
+        "status": "deployed",
+        "status_text": "Partially completed"
+      },
+      {
+        "name": "Security audit follow-up (2026-09-28)",
+        "domains": [
+          "Unauthenticated internal mail relay removed (all senders use 587+SASL), router admin proxy route removed, SSH password authentication disabled, Next.js security patches applied. Some follow-ups are still in progress (gateway#277)"
+        ],
+        "status": "deployed",
+        "status_text": "Key actions completed"
       }
     ],
     "roadmap": {
@@ -525,10 +545,10 @@
     }
   },
   "mermaid": {
-    "posselect": "\n            Internet[Internet] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> HF[home.front]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|partner account issuance| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|Partner API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            PF -.->|Product QA| PA\n            PA -.->|Embedding & Answer Gen| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets Bucket| MO2[MinIO<br/>leedohyun.com Same instance as tab]\n            UI -.->|Signed URL| IP\n\n            GF -.->|Metric Scraping| GW\n            GF -.->|Metric Scraping| AA\n            GF -.->|Metric Scraping| PA\n            GF -.->|Metric Scraping| OA\n            GF -.->|Via Exporter| PG2\n            GF -.->|Via Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            PA --> Redis2[Redis<br/>Cart]\n        ",
-    "leedohyun": "\n            Internet[Internet] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>This page you are viewing]\n            GW --> RT[Router Admin Proxy]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
+    "posselect": "\n            Internet[Internet] --> DNS2[Route 53<br/>posselect.com]\n            DNS2 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>leedohyun.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> HF[store.front<br/>home.posselect.com]\n            GW --> CF[customer.front]\n            GW --> PF[product.front]\n            GW --> ADF[admin.front]\n            GW --> AA[auth.api]\n            GW --> PA[product-api]\n            GW --> OA[order-api]\n            GW --> KC[Keycloak<br/>keycloak.posselect.com]\n            GW --> GF[Grafana<br/>monitoring.posselect.com]\n            GW --> IP[imgproxy<br/>image.posselect.com]\n            GW --> PTF[partner.front<br/>partner.posselect.com]\n            GW --> UI[posselect-ui<br/>ui.posselect.com]\n\n            AA --> KC\n            ADF -.-> KC\n            ADF -.->|partner account issuance| KC\n            PTF -.->|partner realm| KC\n            PTF -.->|Partner API| PA\n            CF -.-> AA\n            HF -.-> AA\n            PA -.-> OA\n            HF -.->|Products / Banners / Wishlist| PA\n            OA -.->|Member grade / discount rate| AA\n            AA -.->|Confirmed purchase amount| OA\n            PF -.->|Product QA| PA\n            PA -.->|Embedding & Answer Gen| OAI[OpenAI API<br/>text-embedding-3-small / gpt-4o-mini]\n            IP -.->|design-assets Bucket| MO2[MinIO<br/>leedohyun.com Same instance as tab]\n            UI -.->|Signed URL| IP\n\n            GF -.->|Metric Scraping| GW\n            GF -.->|Metric Scraping| AA\n            GF -.->|Metric Scraping| PA\n            GF -.->|Metric Scraping| OA\n            GF -.->|Via Exporter| PG2\n            GF -.->|Via Exporter| Redis2\n\n            KC --> PG1[PostgreSQL]\n            PA --> PG2[PostgreSQL<br/>catalog + pgvector]\n            OA --> PG3[PostgreSQL<br/>orders]\n            AA --> PG4[PostgreSQL<br/>auth members / grades]\n            PA --> Redis2[Redis<br/>Cart]\n        ",
+    "leedohyun": "\n            Internet[Internet] --> DNS1[Route 53<br/>leedohyun.com]\n            DNS1 --> Router[Home Router<br/>Port Forwarding 80/443/25]\n            Router --> Traefik[Traefik Ingress<br/>kube-system, MetalLB IP Sharing]\n            Traefik --> GW[Spring Cloud Gateway<br/>posselect.com Shared Entrypoint — See 'Common Infra' tab]\n\n            GW --> WP[WordPress<br/>leedohyun.com / blog]\n            GW --> MO[MinIO<br/>minio / static]\n            GW --> TL[Tool]\n            GW --> AW[Architecture Web<br/>This page you are viewing]\n\n            WP --> MySQL1[MySQL]\n            WP --> Redis1[Redis]\n        ",
     "infra": "\n            GW[Spring Cloud Gateway<br/>Two domains Shared Entrypoint] -.->|Send mail| MAIL[Self-hosted Mail<br/>leedohyun.com + posselect.com]\n\n            PROM[Prometheus] --> GF2[Grafana]\n            GF2 --> AM[Alertmanager<br/>Email Alert]\n            LOKI[Loki / Promtail<br/>Log Collection]\n            JG[Jaeger<br/>Distributed Tracing]\n            VL[Velero<br/>PVC Backup]\n\n            PROM -.->|Metric Scraping| GW\n            LOKI -.->|All Namespaces| GW\n            JG -.->|OTel javaagent| GW\n            VL -.->|node-agent, MinIO saved to| MO[MinIO]\n        ",
-    "domainsplit": "\n            subgraph before[Before: leedohyun.com Single Domain]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[Current: Domain Split]\n                A1[leedohyun.com<br/>Personal Use] --> A2[blog / minio / tool / architecture / router / monitoring]\n                A3[posselect.com<br/>Shop Use] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.Transition.-> after\n        ",
+    "domainsplit": "\n            subgraph before[Before: leedohyun.com Single Domain]\n                B1[leedohyun.com] --> B2[home / customer / product / admin]\n                B1 --> B3[blog / redmine / minio / tool / ...]\n                B2 --> B4[Keycloak<br/>keycloak.leedohyun.com]\n            end\n\n            subgraph after[Current: Domain Split]\n                A1[leedohyun.com<br/>Personal Use] --> A2[blog / minio / tool / architecture / monitoring]\n                A3[posselect.com<br/>Shop Use] --> A4[home / customer / product / admin]\n                A3 --> A5[Keycloak<br/>keycloak.posselect.com]\n            end\n\n            before -.Transition.-> after\n        ",
     "improved": "\n            Internet[Internet] --> DNS[Route 53 DNS<br/>leedohyun.com + posselect.com]\n            DNS --> Router[Personal Router]\n            Router --> Traefik[Traefik Ingress]\n            Traefik --> GW[Spring Cloud Gateway<br/>Single Entrypoint - Completed]\n            Traefik --> Istio[Istio Service Mesh<br/>mTLS]\n\n            GW --> WP[WordPress]\n            GW --> KC[Keycloak]\n            GW --> Shop[Shop - posselect.com]\n\n            GW --> Monitor[Monitor/Log Stack<br/>Prometheus/Grafana/Loki - Completed]\n            Monitor --> AlertManager[Alertmanager<br/>Email Completed, Slack planned]\n\n            GW --> Observability[Observability Stack]\n            Observability --> Kiali[Kiali]\n            Observability --> Jaeger[Jaeger<br/>Java Backend 4 Completed]\n\n            GW --> Storage[Storage]\n            Storage --> MinIO[MinIO]\n            Storage --> Velero[Velero<br/>PVC Auto Backup Completed]\n        ",
     "roadmap": "\n            subgraph now[\"Now - Home Server (Transitional)\"]\n                direction TB\n                MinIO2[MinIO<br/>shop/static, shop/image]\n                ImgProxy[imgproxy<br/>Image Processing]\n            end\n\n            subgraph later[\"Later - Cloud Transition\"]\n                direction TB\n                S3[S3 Compatible Storage<br/>Migrate with same key structure]\n                CDN2[CloudFront / Cloudflare<br/>Single cdn.posselect.com + Path Routing]\n            end\n\n            subgraph newcap[\"New Feature - Cloud Native\"]\n                direction TB\n                Video[VOD<br/>Cloudflare Stream / Mux, etc.]\n                Live[Live Streaming<br/>AWS IVS / MediaConvert, etc.]\n            end\n\n            now -.->|\"Keep Name/URL scheme, replace backend\"| later\n        "
   }
