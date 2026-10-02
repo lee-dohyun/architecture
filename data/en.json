@@ -325,7 +325,7 @@
         "Social login works with Google only — the Kakao (IdP registered in Keycloak, not wired to the screen) and Naver buttons are disabled on the login screen",
         "Velero needs periodic (e.g. 3 months) recovery validation routine",
         "Velero backups live on the same single HDD as the source data — no offsite copy yet (destination/credentials being prepared separately)",
-        "Rate limiting is applied only to the posselect.com Ingress (not leedohyun.com) — circuit breaker is not implemented at all",
+        "Rate limiting exists only on the posselect.com side (Ingress middleware + 6 gateway API routes); leedohyun.com has none. The gateway-side limiter is currently not enforced due to a Redis connectivity problem (gateway#308). A circuit breaker is applied to the same 6 API routes",
         "RAG Product Q&A is fully deployed (code, schema, UI) but pinned to 503 because the OPENAI_API_KEY secret is not registered — registering the key is the only remaining activation step (product.api#60)",
         "The \"recently viewed\" rail on the main page is not built — the history lives in per-site (origin) browser storage, so products viewed on product.posselect.com cannot be read on home. Storage approach pending; time sale not started either (store.front#37)",
         "130 of the 131 first-party products have no sales policy (shipping/return terms) yet, so the product page shows no shipping/exchange/return info — waiting for actual terms; the seller info section is also hidden until business registration (product.front#38)"

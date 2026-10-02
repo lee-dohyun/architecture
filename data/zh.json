@@ -325,7 +325,7 @@
         "社交登录仅 Google 可用 — Kakao（仅在 Keycloak 注册了 IdP）和 Naver 按钮在登录页为禁用状态",
         "Velero需要定期（如3个月）的恢复重新验证例程",
         "Velero 备份仅存放在与原始数据相同的单个硬盘上 — 尚无异地副本（存储目的地与凭证正在另行准备）",
-        "限流仅应用于 posselect.com 的 Ingress，leedohyun.com 尚未应用 — 断路器完全未在代码中实现",
+        "限流仅存在于 posselect.com 一侧（Ingress 中间件 + 网关的 6 条 API 路由），leedohyun.com 未启用。其中网关侧因 Redis 连接问题目前并未生效（gateway#308）。熔断器应用于同样的 6 条 API 路由",
         "RAG 商品问答的代码、schema 与 UI 均已部署，但因未注册 OPENAI_API_KEY 密钥而固定返回 503 — 注册密钥是唯一的启用条件(product.api#60)",
         "首页「最近浏览」区域尚未实现 — 浏览记录保存在按站点（origin）隔离的浏览器存储中，home 无法读取在 product.posselect.com 浏览的商品。存储方式待定，限时特卖也未开始（store.front#37）",
         "131 件自营(1P)商品中有 130 件尚未填写销售政策(配送·退货条件),商品详情页不显示配送·换货·退货说明 — 等待实际条件确定;卖家信息区块也因尚未办理营业登记而隐藏(product.front#38)"
