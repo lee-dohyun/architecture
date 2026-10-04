@@ -1,0 +1,2 @@
+# 이미지(Flask)에는 필요 없다 — Dockerfile 이 `COPY . .` 라 빼지 않으면 e2e/node_modules 가 통째로 들어간다.
+e2e/

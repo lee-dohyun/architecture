@@ -33,7 +33,22 @@ Testcontainers 실DB 검증 체계)에서 도출. posselect #211(재고 차감 �
 | auth.api | ✅ | 도입 중 | auth.api#15 |
 | order.api | 도입 중 | 도입 중 | Postgres+JPA+Flyway 핵심인데 기존엔 0 |
 | gateway | 일부 | - (WebFlux, StepVerifier로 대체) | 라우팅은 YAML 선언이라 통합 테스트 대상이 작음 |
-| posselect-ui / posselect-shell / product.front / admin.front / store.front / customer.front | 도입 중 | 해당 없음(Next.js BFF 없음, 서버 상태 없음) | Vitest + Testing Library, E2E는 향후 별도 검토 |
+| posselect-ui / posselect-shell / product.front / admin.front / store.front / customer.front | 도입 중 | 해당 없음(Next.js BFF 없음, 서버 상태 없음) | Vitest + Testing Library. E2E 는 아래 표의 `architecture/e2e` 가 서비스 횡단으로 담당 |
+
+## E2E 현황 (2026-10-04, architecture#11)
+
+E2E 는 서비스별 저장소가 아니라 **서비스를 가로지르므로 `architecture/e2e/` 한 곳**에 둔다(Playwright, 실제 배포된 도메인 대상).
+실행·규칙은 [`e2e/README.md`](../e2e/README.md).
+
+| 플로우 | 프로젝트 | 상태 |
+|---|---|---|
+| 메인 렌더 / 목록·더보기·검색 / 상세(API↔화면 일치) / 비로그인 접근 제어 | `smoke`(읽기 전용, CI 기본) | ✅ |
+| 비로그인 장바구니 담기→삭제, 재고 불변 | `flow`(운영 쓰기, 수동·`E2E_ALLOW_WRITES=1`) | ✅ |
+| 회원가입·로그인 | — | ❌ 미도입 — 테스트 계정 Secret·SMS OTP 우회 정책 필요 |
+| 주문·결제 | — | ❌ 미도입 — 재고 차감·결제 부작용의 원복 설계 필요 |
+| 관리자 상품 등록 | — | ❌ 미도입 — staff realm 에 테스트 계정 없음 |
+
+"E2E 에서 못 덮는 곳"을 숨기지 않는다: 로그인 이후 플로우는 아직 자동 검증이 없다.
 
 ## 원칙
 

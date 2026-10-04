@@ -25,7 +25,7 @@ docker run -p 5000:5000 architecture-web
 ```
 
 CI (`.github/workflows/docker-image.yml`) builds and pushes `leedohyun1985/architecture-web:latest` and
-`:<sha>` to Docker Hub on push to `main`. There is no test suite and no CD job — deployment to the cluster
+`:<sha>` to Docker Hub on push to `main`. The only tests are the Playwright E2E suite in `e2e/` (read-only `smoke` + opt-in write `flow`, see `e2e/README.md`; CI: `.github/workflows/e2e.yml`) and there is no CD job — deployment to the cluster
 is manual (`kubectl set image ... -n default`, see [gateway](../gateway) repo's CD jobs for the pattern this
 repo doesn't yet have).
 
