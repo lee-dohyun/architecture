@@ -1,0 +1,16 @@
+{
+  "name": "posselect-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "description": "posselect.com 핵심 사용자 플로우 E2E (Playwright) — architecture#11",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --project=smoke",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
