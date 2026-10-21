@@ -101,7 +101,7 @@
             "domains": [
               "customer.posselect.com"
             ],
-            "desc": "Login/Signup/Profile editing features. Backend integration completed for terms of service and privacy policy. My page shows the membership grade, benefits and the amount left to the next grade; Google social-login members finish sign-up on an onboarding screen (terms consent + phone verification) (2026-10-02). Added the member notification inbox (list and mark-as-read for the header notification button) (2026-10-04).",
+            "desc": "Login/Signup/Profile editing features. Backend integration completed for terms of service and privacy policy. My page shows the membership grade, benefits and the amount left to the next grade; Google social-login members finish sign-up on an onboarding screen (terms consent + phone verification) (2026-10-02). Added the member notification inbox (list and mark-as-read for the header notification button) (2026-10-04). Added an order detail page (delivery status and tracking) and per-item cancel/return/exchange requests (2026-10-14).",
             "status": "deployed"
           },
           {
@@ -109,7 +109,7 @@
             "domains": [
               "product.posselect.com"
             ],
-            "desc": "Product list and cart. Product info API caching applied. The product list loads 24 items at a time with a \"Load more\" button; supports wishlists and shows the membership grade discount on the cart and order-complete screens.",
+            "desc": "Product list and cart. Product info API caching applied. The product list loads 24 items at a time with a \"Load more\" button; supports wishlists and shows the membership grade discount on the cart and order-complete screens. The cart shows the per-seller shipping fee and the same amount is charged. Customers who ordered without logging in can view, cancel, return or exchange their order on the guest order lookup page (/guest-order, order number + phone) (2026-10-14).",
             "status": "deployed"
           },
           {
@@ -125,7 +125,7 @@
             "domains": [
               "/api/orders/** (customer.posselect.com, product.posselect.com)"
             ],
-            "desc": "Order/Payment processing (Mock). Automatic account linking. Applies the membership grade discount to the order amount and snapshots the grade at order time. Orders are confirmed per offer (seller-specific sales terms). Failed stock-restore compensations are recorded as pending and retried by a scheduler. Registers a notification in the member inbox (auth.api) when payment completes.",
+            "desc": "Order/Payment processing (Mock). Automatic account linking. Applies the membership grade discount to the order amount and snapshots the grade at order time. Orders are confirmed per offer (seller-specific sales terms). Failed stock-restore compensations are recorded as pending and retried by a scheduler. Registers a notification in the member inbox (auth.api) when payment completes. Order creation is idempotent via Idempotency-Key (a retry still yields one order). Per-item cancel/return/exchange claims and refund calculation (grade-discount proration, shipping-fee recalculation, return shipping fee) are handled in one place (2026-10-14).",
             "status": "deployed"
           },
           {
@@ -279,7 +279,7 @@
           },
           {
             "name": "kube-prometheus-stack (Prometheus/Grafana/Alertmanager)",
-            "desc": "Prometheus/Grafana/Alertmanager monitoring stack. Email alert integration.",
+            "desc": "Prometheus/Grafana/Alertmanager monitoring stack. Email alert integration. Added service alert rules (gateway 5xx rate, p95 latency, certificate expiry) and DB backup failure/staleness alerts (2026-10-14) — but the only receiver is email, so they currently do not arrive.",
             "status": "deployed"
           },
           {
@@ -294,7 +294,7 @@
           },
           {
             "name": "Velero (Backup Automation)",
-            "desc": "Daily automated backup of PVC data based on MinIO.",
+            "desc": "Daily automated backup of PVC data based on MinIO. Separately, PostgreSQL (shop and Keycloak) is logically dumped daily (pg_dump, kept 14 days), with a restore rehearsal into an empty DB completed (2026-10-14).",
             "status": "deployed"
           }
         ],
@@ -320,16 +320,16 @@
         "RBAC granularity is still not applied. NetworkPolicy (default-deny-ingress + allow rules) is applied only in the customer namespace (shop, since 2026-08-17) — the default namespace (personal services) has none. Istio/service mesh was deliberately not adopted as overkill for this scale (alternative: single gateway entry point)",
         "Distributed tracing only measures 4 Java backends (Next.js frontends not measured), no Kiali/Service Mesh observability yet",
         "Single point of failure (Single node cluster, no redundancy)",
-        "Alertmanager is integrated with Email only — and Gmail rejects the server IP, so every alert mail bounces and alerts currently do not arrive (checked 2026-10-02). No alternative channel such as Slack yet",
-        "The self-hosted mail server sits on a residential dynamic IP with no PTR, and after the 2026-09 open-relay abuse incident the IP is listed on Spamhaus, Barracuda and UCEPROTECT. Unauthenticated internal relay has been removed (all senders use 587+SASL), but as of 2026-10-02 the listings remain, so external receivers reject its mail (gateway#276)",
+        "Alertmanager is integrated with Email only — and Gmail rejects the server IP, so every alert mail bounces and alerts currently do not arrive (checked 2026-10-21). Scripts to add a Discord webhook and external uptime monitoring (UptimeRobot) are ready, waiting for the webhook/account to be issued (gateway#325)",
+        "The self-hosted mail server sits on a residential dynamic IP with no PTR, and after the 2026-09 open-relay abuse incident the IP was blacklisted. Unauthenticated internal relay has been removed (all senders use 587+SASL), but a 2026-10-21 lookup still shows Spamhaus and Barracuda listings, so external receivers reject its mail (gateway#276)",
         "architecture-web/tool/wordpress are still deployed manually",
         "Social login works with Google only — the Kakao (IdP registered in Keycloak, not wired to the screen) and Naver buttons are disabled on the login screen",
-        "Velero needs periodic (e.g. 3 months) recovery validation routine",
-        "Velero backups live on the same single HDD as the source data — no offsite copy yet (destination/credentials being prepared separately)",
+        "Velero restores need periodic re-validation — last rehearsal 2026-08-13, next planned for 2026-11. The DB logical dumps passed a restore rehearsal into an empty DB on 2026-10-14 (gateway#326)",
+        "Backups live only on the same single HDD as the source — the offsite copy pipeline (encrypted sync, daily 05:00) is built, but while waiting for the external storage (R2) key its target is still a staging bucket on the same disk (posselect-shell#18)",
         "Rate limiting exists only on the posselect.com side (Ingress middleware + 6 gateway API routes); leedohyun.com has none. A circuit breaker is applied to the same 6 API routes",
         "RAG Product Q&A is fully deployed (code, schema, UI) but pinned to 503 because the OPENAI_API_KEY secret is not registered — registering the key is the only remaining activation step (product.api#60)",
         "The \"recently viewed\" rail on the main page is not built — the history lives in per-site (origin) browser storage, so products viewed on product.posselect.com cannot be read on home. Storage approach pending; time sale not started either (store.front#37)",
-        "130 of the 131 first-party products have no sales policy (shipping/return terms) yet, so the product page shows no shipping/exchange/return info — waiting for actual terms; the seller info section is also hidden until business registration (product.front#38)"
+        "130 of the 131 first-party products have no sales policy (shipping/return terms) yet, so the product page shows no shipping/exchange/return info — waiting for actual terms; the seller info section is also hidden until business registration (product.front#38) Shipping fees are charged only for products with a sales policy, so most products are currently ordered with a 0 shipping fee (checked 2026-10-21: 1 of 131 has a policy)."
       ]
     },
     "domain_split": {
@@ -363,12 +363,12 @@
       "backward_compat": "Legacy leedohyun.com based hosts redirect to posselect.com with 302 to maintain compatibility."
     },
     "resources": {
-      "cpu": "~12% (24h average, single 6-core Ryzen 5 1600, measured 2026-10-02)",
-      "memory": "~26% (24h average, 62Gi DDR4, measured 2026-10-02)",
+      "cpu": "~10% (24h average, single 6-core Ryzen 5 1600, measured 2026-10-21)",
+      "memory": "~22% (24h average, 62Gi DDR4, measured 2026-10-21)",
       "nodes": 1,
       "cluster_type": "K3s v1.33 (Single node, control-plane + worker)"
     },
-    "updated_at": "2026-10-03",
+    "updated_at": "2026-10-21",
     "improved": [
       {
         "name": "Spring Cloud Gateway Single Entry Point",
@@ -429,7 +429,7 @@
       {
         "name": "Supply Chain Security (Dependabot + Trivy Image Scan + gitleaks Secret Scan)",
         "domains": [
-          "Automated dependency update PRs + container image vulnerability scanning + secret-leak scanning on commits (gitleaks, 2026-10-01) rolled out across all repositories (Dependabot: all except tool.front)"
+          "Automated dependency update PRs + container image vulnerability scanning + secret-leak scanning on commits (gitleaks, 2026-10-01) rolled out across all repositories (Dependabot: all except tool.front) Since 2026-10-03 Trivy is a deploy gate — a CRITICAL with an available fix stops the deployment."
         ],
         "status": "deployed",
         "status_text": "Completed (13 repos)"
@@ -497,6 +497,14 @@
         ],
         "status": "deployed",
         "status_text": "Key actions completed"
+      },
+      {
+        "name": "After the order — cancel/return/exchange, tracking, guest orders",
+        "domains": [
+          "Shipped per-item cancel/return/exchange requests with refund calculation, order detail and tracking, shipping fees charged at checkout, and guest order lookup with mail links (2026-10-14, gateway#320–#323)"
+        ],
+        "status": "deployed",
+        "status_text": "Completed"
       }
     ],
     "roadmap": {
